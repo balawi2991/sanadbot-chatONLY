@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  bot       Bot?
+  
+  @@map("users")
+}
+
+// Bot configuration for each user
+model Bot {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  name        String   @default("مساعد سند")
+  color       String   @default("#3B82F6")
+  logo        String?
+  avatar      String?
+  placeholder String   @default("اكتب رسالتك هنا...")
+  welcome     String   @default("مرحباً! كيف يمكنني مساعدتك اليوم؟")
+  personality String   @default("أنا مساعد ذكي ومفيد، أجيب على الأسئلة بطريقة ودودة ومهنية.")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  knowledgeSources KnowledgeSource[]
+  qas             QA[]
+  conversations   Conversation[]
+  
+  @@map("bots")
+}
+
+// Knowledge sources (files, links, text)
+model KnowledgeSource {
+  id        String   @id @default(cuid())
+  botId     String
+  type      String   // "file", "link", "text"
+  title     String
+  content   String   @db.Text
+  url       String?
+  filename  String?
+  filesize  Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  
+  @@map("knowledge_sources")
+}
+
+// Manual Q&A pairs
+model QA {
+  id        String   @id @default(cuid())
+  botId     String
+  question  String
+  answer    String   @db.Text
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  
+  @@map("qas")
+}
+
+// Conversation history
+model Conversation {
+  id           String   @id @default(cuid())
+  botId        String
+  clientId     String   // Anonymous client identifier
+  question     String   @db.Text
+  answer       String   @db.Text
+  responseType String   // "qa", "rag", "fallback"
+  createdAt    DateTime @default(now())
+  
+  // Relations
+  bot          Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  
+  @@map("conversations")
+}
