@@ -49,7 +49,7 @@ export default function Dashboard() {
     )
   }
 
-  const embedCode = botData ? `<script src="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3002'}/embed/${botData.id}.js"></script>` : ""
+  const embedCode = botData ? `<script src="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3002'}/embed.js" data-bot-id="${botData.id}"></script>` : ""
 
   return (
     <div>

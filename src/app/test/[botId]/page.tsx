@@ -11,9 +11,11 @@ interface BotData {
   name: string
   color: string
   placeholder: string
-  welcome: string
+  welcomeMessage: string
   personality: string
   isActive: boolean
+  logo?: string
+  avatar?: string
   _count: {
     conversations: number
     qas: number
@@ -92,7 +94,7 @@ const TestBotPage = () => {
     name: botData.name,
     color: botData.color,
     placeholder: botData.placeholder,
-    welcomeMessage: botData.welcome,
+    welcomeMessage: botData.welcomeMessage,
     personality: botData.personality
   }
 

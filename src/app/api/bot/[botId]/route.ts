@@ -43,8 +43,10 @@ export async function GET(
       id: bot.id,
       name: bot.name,
       color: bot.color,
+      logo: bot.logo,
+      avatar: bot.avatar,
       placeholder: bot.placeholder,
-      welcome: bot.welcome,
+      welcomeMessage: bot.welcome,
       personality: bot.personality,
       isActive: bot.isActive,
       _count: bot._count
