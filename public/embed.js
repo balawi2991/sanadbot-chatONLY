@@ -10,19 +10,20 @@
   
   console.log('SanadBot: Starting widget initialization...');
 
-  // الحصول على معرف البوت من السكريپت
-  const currentScript = document.currentScript || document.querySelector('script[data-agent-id]');
-  const botId = currentScript?.getAttribute('data-agent-id');
+  // الحصول على معرف البوت من السكريپت (دعم كلا الخاصيتين للتوافق)
+  const currentScript = document.currentScript || document.querySelector('script[data-agent-id], script[data-bot-id]');
+  const botId = currentScript?.getAttribute('data-agent-id') || currentScript?.getAttribute('data-bot-id');
   
   if (!botId) {
-    console.error('SanadBot: Bot ID is required. Please add data-agent-id attribute to the script tag.');
+    console.error('SanadBot: Bot ID is required. Please add data-agent-id or data-bot-id attribute to the script tag.');
     return;
   }
 
   // إعدادات البوت
   const scriptSrc = currentScript.src;
   const scriptUrl = new URL(scriptSrc);
-  const WIDGET_API_URL = `${scriptUrl.protocol}//${scriptUrl.host}/api/widget/${botId}`;
+  const timestamp = Date.now();
+  const WIDGET_API_URL = `${scriptUrl.protocol}//${scriptUrl.host}/api/widget/${botId}?t=${timestamp}`;
   
   // تحميل البوت مباشرة
   function loadWidget() {

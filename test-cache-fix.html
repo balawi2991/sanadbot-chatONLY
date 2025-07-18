@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار إصلاح مشكلة الـ Cache - بوت سند</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+        .expected {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+        .expected h3 {
+            color: #155724;
+            margin-top: 0;
+        }
+        .expected ul {
+            color: #155724;
+            margin: 10px 0;
+        }
+        .test-time {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #ffc107;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 اختبار إصلاح مشكلة الـ Cache</h1>
+        
+        <div class="info">
+            <h3>📋 معلومات الاختبار:</h3>
+            <p><strong>معرف البوت:</strong> cmd6zy2o3000mvpl85isweckl</p>
+            <p><strong>الهدف:</strong> التأكد من ظهور التخصيصات الجديدة بدون مشاكل الـ cache</p>
+        </div>
+
+        <div class="test-time">
+            ⏰ وقت الاختبار: <span id="testTime"></span>
+        </div>
+
+        <div class="expected">
+            <h3>✅ النتائج المتوقعة:</h3>
+            <ul>
+                <li><strong>اسم البوت:</strong> "مساعد سند"</li>
+                <li><strong>اللون الأساسي:</strong> أحمر (#EF4444)</li>
+                <li><strong>نص الإدخال:</strong> "اكتب رسالتك هنا..."</li>
+                <li><strong>رسالة الترحيب:</strong> "مرحباً! كيف يمكنني مساعدتك اليوم؟"</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <h3>🔧 الإصلاحات المطبقة:</h3>
+            <ul>
+                <li>تم تعطيل الـ cache في API endpoint</li>
+                <li>تم إضافة timestamp للـ widget URL</li>
+                <li>تم إضافة headers لمنع الـ cache</li>
+            </ul>
+        </div>
+
+        <p style="text-align: center; margin-top: 30px; color: #666;">
+            يجب أن يظهر البوت الآن بالتخصيصات الصحيحة بدون مشاكل الـ cache
+        </p>
+    </div>
+
+    <!-- تضمين بوت سند مع معرف البوت -->
+    <script 
+        src="http://localhost:3002/embed.js" 
+        data-bot-id="cmd6zy2o3000mvpl85isweckl"
+        async>
+    </script>
+
+    <script>
+        // عرض وقت الاختبار
+        document.getElementById('testTime').textContent = new Date().toLocaleString('ar-SA');
+        
+        // تسجيل معلومات التحميل
+        console.log('🧪 بدء اختبار إصلاح الـ Cache:', new Date().toISOString());
+        console.log('🔗 معرف البوت:', 'cmd6zy2o3000mvpl85isweckl');
+        
+        // مراقبة تحميل البوت
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                if (window.SanadBot) {
+                    console.log('✅ تم تحميل البوت بنجاح');
+                    console.log('📊 إعدادات البوت:', window.SanadBot.config);
+                } else {
+                    console.log('❌ لم يتم تحميل البوت');
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

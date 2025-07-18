@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار كود التضمين من الداشبورد - سند بوت</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        .info-box {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin: 2rem 0;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .code-block {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            text-align: left;
+            direction: ltr;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .highlight {
+            color: #ffd700;
+            font-weight: bold;
+        }
+        .status {
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-weight: bold;
+        }
+        .warning {
+            background: rgba(255, 165, 0, 0.2);
+            border: 2px solid #ffa500;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 اختبار كود الداشبورد</h1>
+        <p>هذه صفحة اختبار لكود التضمين الفعلي الذي يظهر في الداشبورد</p>
+        
+        <div class="info-box">
+            <h2>📋 كود التضمين المستخدم (من الداشبورد):</h2>
+            <div class="code-block">
+                &lt;script src="http://localhost:3002/embed.js" data-bot-id="<span class="highlight">demo</span>"&gt;&lt;/script&gt;
+            </div>
+            <p><strong>ملاحظة:</strong> هذا هو نفس الكود الذي يظهر في الداشبورد</p>
+        </div>
+        
+        <div class="info-box">
+            <h2>🔍 ما نختبره:</h2>
+            <ul style="text-align: right; list-style: none; padding: 0;">
+                <li>🔹 تحميل embed.js من الخادم</li>
+                <li>🔹 قراءة data-bot-id بدلاً من data-agent-id</li>
+                <li>🔹 استدعاء API للحصول على إعدادات البوت</li>
+                <li>🔹 إنشاء واجهة البوت في DOM</li>
+                <li>🔹 عمل جميع الوظائف (فتح/إغلاق، إرسال رسائل)</li>
+            </ul>
+        </div>
+        
+        <div class="info-box">
+            <h2>🛠️ خطوات التشخيص:</h2>
+            <ol style="text-align: right;">
+                <li>افتح أدوات المطور (F12)</li>
+                <li>تحقق من تبويب Network لرؤية طلبات التحميل</li>
+                <li>تحقق من تبويب Console لرؤية الرسائل</li>
+                <li>تحقق من تبويب Elements لرؤية DOM</li>
+            </ol>
+        </div>
+        
+        <div id="status" class="status">
+            ✅ جاري تحميل البوت...
+        </div>
+    </div>
+
+    <!-- كود التضمين الفعلي من الداشبورد -->
+    <script src="http://localhost:3002/embed.js" data-bot-id="demo"></script>
+    
+    <script>
+        // مراقبة حالة التحميل
+        setTimeout(() => {
+            const statusDiv = document.getElementById('status');
+            if (window.SanadBot) {
+                statusDiv.innerHTML = '✅ تم تحميل البوت بنجاح!';
+                statusDiv.className = 'status';
+            } else {
+                statusDiv.innerHTML = '❌ فشل في تحميل البوت - تحقق من Console';
+                statusDiv.className = 'warning';
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
