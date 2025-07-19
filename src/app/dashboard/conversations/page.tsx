@@ -152,15 +152,23 @@ export default function ConversationsPage() {
   }, [searchTerm])
 
   // Helper functions
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('ar-SA', {
+  const formatTime = (date: Date | string) => {
+    const dateObj = date instanceof Date ? date : new Date(date)
+    if (isNaN(dateObj.getTime())) {
+      return 'وقت غير صالح'
+    }
+    return dateObj.toLocaleTimeString('ar-SA', {
       hour: '2-digit',
       minute: '2-digit'
     })
   }
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('ar-SA', {
+  const formatDate = (date: Date | string) => {
+    const dateObj = date instanceof Date ? date : new Date(date)
+    if (isNaN(dateObj.getTime())) {
+      return 'تاريخ غير صالح'
+    }
+    return dateObj.toLocaleDateString('ar-SA', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -174,11 +182,6 @@ export default function ConversationsPage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     // Search logic is handled by fetchConversations
-  }
-
-  // Filter handler
-  const handleFilterChange = (type: 'all' | 'qa' | 'rag' | 'fallback') => {
-    setFilterType(type)
   }
 
   // Pagination handlers
@@ -346,7 +349,7 @@ export default function ConversationsPage() {
                             {session.visitorName}
                           </h3>
                           <span className="text-xs text-gray-500">
-                            {formatDate(new Date(session.createdAt))}
+                            {formatDate(session.createdAt)}
                           </span>
                         </div>
                         <h4 className="text-sm font-medium text-gray-800 truncate mb-1">
@@ -357,7 +360,7 @@ export default function ConversationsPage() {
                         </p>
                         <div className="flex items-center gap-2 mt-2">
                           <span className="text-xs text-gray-500">
-                            {formatTime(new Date(session.lastMessageTime))}
+                            {formatTime(session.lastMessageTime)}
                           </span>
                           <span className="text-xs text-gray-400">•</span>
                           <span className="text-xs text-gray-500">
@@ -419,7 +422,7 @@ export default function ConversationsPage() {
                       {selectedConversation.title}
                     </h4>
                     <CardDescription>
-                      {formatDate(new Date(selectedConversation.createdAt))} - {selectedConversation.messageCount} رسالة
+                      {formatDate(selectedConversation.createdAt)} - {selectedConversation.messageCount} رسالة
                     </CardDescription>
                   </div>
                   <Badge variant="secondary">
