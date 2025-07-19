@@ -14,9 +14,25 @@ interface MessageType {
   id: string
   type: 'user' | 'bot'
   content: string
+  responseType?: string
   timestamp: Date
 }
 
+interface ConversationSessionType {
+  id: string
+  clientId: string
+  title: string
+  messageCount: number
+  lastMessage: string
+  lastMessageTime: string
+  createdAt: string
+  updatedAt: string
+  messages: MessageType[]
+  // Computed fields for UI
+  visitorName: string
+}
+
+// Legacy type for backward compatibility
 interface ConversationType {
   id: string
   clientId: string
@@ -39,17 +55,15 @@ interface ConversationStats {
 
 export default function ConversationsPage() {
   const { data: session, status } = useSession()
-  const [conversations, setConversations] = useState<ConversationType[]>([])
-  const [selectedConversation, setSelectedConversation] = useState<ConversationType | null>(null)
+  const [conversationSessions, setConversationSessions] = useState<ConversationSessionType[]>([])
+  const [selectedConversation, setSelectedConversation] = useState<ConversationSessionType | null>(null)
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterType, setFilterType] = useState<'all' | 'qa' | 'rag' | 'fallback'>('all')
-  const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all')
   const [stats, setStats] = useState<ConversationStats>({ total: 0, qa: 0, rag: 0, fallback: 0 })
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
-  // Fetch conversations from API
+  // Fetch conversation sessions from API
   const fetchConversations = async () => {
     if (status !== 'authenticated') return
     
@@ -58,47 +72,19 @@ export default function ConversationsPage() {
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: '20',
-        search: searchTerm,
-        type: filterType
+        search: searchTerm
       })
       
-      const response = await fetch(`/api/conversations?${params}`)
-      if (!response.ok) throw new Error('Failed to fetch conversations')
+      const response = await fetch(`/api/conversation-sessions?${params}`)
+      if (!response.ok) throw new Error('Failed to fetch conversation sessions')
       
       const data = await response.json()
       
-      // Transform API data to match UI structure
-      const transformedConversations: ConversationType[] = data.conversations.map((conv: any) => ({
-        id: conv.id,
-        clientId: conv.clientId,
-        question: conv.question,
-        answer: conv.answer,
-        responseType: conv.responseType,
-        createdAt: conv.createdAt,
-        // Computed fields for UI
-        visitorName: conv.clientId === 'anonymous' ? 'زائر مجهول' : `زائر ${conv.clientId.slice(-4)}`,
-        lastMessage: conv.question,
-        messages: [
-          {
-            id: `${conv.id}-q`,
-            type: 'user' as const,
-            content: conv.question,
-            timestamp: new Date(conv.createdAt)
-          },
-          {
-            id: `${conv.id}-a`,
-            type: 'bot' as const,
-            content: conv.answer,
-            timestamp: new Date(new Date(conv.createdAt).getTime() + 30000) // Add 30 seconds
-          }
-        ]
-      }))
-      
-      setConversations(transformedConversations)
+      setConversationSessions(data.conversationSessions)
       setTotalPages(data.pagination.pages)
       
     } catch (error) {
-      console.error('Error fetching conversations:', error)
+      console.error('Error fetching conversation sessions:', error)
     } finally {
       setLoading(false)
     }
@@ -109,11 +95,37 @@ export default function ConversationsPage() {
     if (status !== 'authenticated') return
     
     try {
-      const response = await fetch('/api/conversations/stats')
+      const response = await fetch('/api/conversation-sessions?limit=1000') // Get all for stats
       if (!response.ok) throw new Error('Failed to fetch stats')
       
       const data = await response.json()
-      setStats(data)
+      const sessions = data.conversationSessions
+      
+      // Calculate stats from messages in sessions
+      let totalMessages = 0
+      let qaCount = 0
+      let ragCount = 0
+      let fallbackCount = 0
+      
+      sessions.forEach((session: any) => {
+        session.messages.forEach((message: any) => {
+          if (message.type === 'bot') {
+            totalMessages++
+            if (message.responseType === 'qa') qaCount++
+            else if (message.responseType === 'rag') ragCount++
+            else if (message.responseType === 'fallback') fallbackCount++
+          }
+        })
+      })
+      
+      const stats = {
+        total: sessions.length,
+        qa: qaCount,
+        rag: ragCount,
+        fallback: fallbackCount
+      }
+      
+      setStats(stats)
       
     } catch (error) {
       console.error('Error fetching stats:', error)
@@ -125,7 +137,7 @@ export default function ConversationsPage() {
       fetchConversations()
       fetchStats()
     }
-  }, [status, currentPage, searchTerm, filterType])
+  }, [status, currentPage, searchTerm])
 
   // Handle search with debounce
   useEffect(() => {
@@ -137,7 +149,7 @@ export default function ConversationsPage() {
     }, 500)
     
     return () => clearTimeout(timeoutId)
-  }, [searchTerm, filterType])
+  }, [searchTerm])
 
   // Helper functions
   const formatTime = (date: Date) => {
@@ -303,34 +315,13 @@ export default function ConversationsPage() {
                   />
                 </div>
               </div>
-              <div className="flex gap-2">
-                <select
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value)}
-                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="all">جميع الأنواع</option>
-                  <option value="qa">أسئلة وأجوبة</option>
-                  <option value="rag">ذكاء اصطناعي</option>
-                  <option value="fallback">ردود احتياطية</option>
-                </select>
-                <select
-                  value={dateFilter}
-                  onChange={(e) => setDateFilter(e.target.value as 'all' | 'today' | 'week' | 'month')}
-                  className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="all">جميع التواريخ</option>
-                  <option value="today">اليوم</option>
-                  <option value="week">هذا الأسبوع</option>
-                  <option value="month">هذا الشهر</option>
-                </select>
-              </div>
+
             </form>
-            <p className="text-xs text-gray-600 mt-2">{conversations.length} محادثة</p>
+            <p className="text-xs text-gray-600 mt-2">{conversationSessions.length} محادثة</p>
           </CardHeader>
           
           <div className="overflow-y-auto h-full">
-            {conversations.length === 0 ? (
+            {conversationSessions.length === 0 ? (
               <div className="p-8 text-center">
                 <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -340,34 +331,37 @@ export default function ConversationsPage() {
               </div>
             ) : (
               <div className="divide-y divide-gray-200">
-                {conversations.map((conversation) => (
+                {conversationSessions.map((session) => (
                   <div
-                    key={conversation.id}
-                    onClick={() => setSelectedConversation(conversation)}
+                    key={session.id}
+                    onClick={() => setSelectedConversation(session)}
                     className={`p-4 cursor-pointer transition-colors hover:bg-gray-50 ${
-                      selectedConversation?.id === conversation.id ? 'bg-blue-50 border-r-4 border-blue-500' : ''
+                      selectedConversation?.id === session.id ? 'bg-blue-50 border-r-4 border-blue-500' : ''
                     }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="text-sm font-medium text-gray-900 truncate">
-                            {conversation.visitorName}
+                            {session.visitorName}
                           </h3>
                           <span className="text-xs text-gray-500">
-                            {formatDate(new Date(conversation.createdAt))}
+                            {formatDate(new Date(session.createdAt))}
                           </span>
                         </div>
+                        <h4 className="text-sm font-medium text-gray-800 truncate mb-1">
+                          {session.title}
+                        </h4>
                         <p className="text-sm text-gray-600 truncate">
-                          {truncateMessage(conversation.lastMessage)}
+                          {truncateMessage(session.lastMessage)}
                         </p>
                         <div className="flex items-center gap-2 mt-2">
                           <span className="text-xs text-gray-500">
-                            {formatTime(new Date(conversation.createdAt))}
+                            {formatTime(new Date(session.lastMessageTime))}
                           </span>
                           <span className="text-xs text-gray-400">•</span>
                           <span className="text-xs text-gray-500">
-                            {conversation.messages.length} رسالة
+                            {session.messageCount} رسالة
                           </span>
                         </div>
                       </div>
@@ -421,18 +415,15 @@ export default function ConversationsPage() {
                     <CardTitle className="text-lg">
                       محادثة مع {selectedConversation.visitorName}
                     </CardTitle>
+                    <h4 className="text-sm font-medium text-gray-700 mb-1">
+                      {selectedConversation.title}
+                    </h4>
                     <CardDescription>
-                      {formatDate(new Date(selectedConversation.createdAt))} - {selectedConversation.messages.length} رسالة
+                      {formatDate(new Date(selectedConversation.createdAt))} - {selectedConversation.messageCount} رسالة
                     </CardDescription>
                   </div>
-                  <Badge variant={
-                    selectedConversation.responseType === 'qa' ? 'success' :
-                    selectedConversation.responseType === 'rag' ? 'secondary' :
-                    'destructive'
-                  }>
-                    {selectedConversation.responseType === 'qa' ? 'أسئلة وأجوبة' :
-                     selectedConversation.responseType === 'rag' ? 'ذكاء اصطناعي' :
-                     'رد احتياطي'}
+                  <Badge variant="secondary">
+                    جلسة محادثة
                   </Badge>
                 </div>
               </CardHeader>
@@ -452,11 +443,25 @@ export default function ConversationsPage() {
                       }`}
                     >
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                      <p className={`text-xs mt-2 ${
-                        message.type === 'user' ? 'text-blue-100' : 'text-gray-500'
-                      }`}>
-                        {formatTime(message.timestamp)}
-                      </p>
+                      <div className="flex items-center justify-between mt-2">
+                        <p className={`text-xs ${
+                          message.type === 'user' ? 'text-blue-100' : 'text-gray-500'
+                        }`}>
+                          {formatTime(message.timestamp)}
+                        </p>
+                        {message.type === 'bot' && message.responseType && (
+                          <span className={`text-xs px-2 py-0.5 rounded ${
+                            message.responseType === 'qa'
+                              ? 'bg-green-200 text-green-800'
+                              : message.responseType === 'rag'
+                              ? 'bg-blue-200 text-blue-800'
+                              : 'bg-gray-200 text-gray-800'
+                          }`}>
+                            {message.responseType === 'qa' ? 'Q&A' :
+                             message.responseType === 'rag' ? 'AI' : 'Default'}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}

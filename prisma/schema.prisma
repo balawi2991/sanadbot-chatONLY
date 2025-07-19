@@ -33,10 +33,11 @@ model Bot {
   glowEffect       Boolean           @default(true)
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  conversations    Conversation[]
-  knowledgeSources KnowledgeSource[]
-  qas              QA[]
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversations        Conversation[]
+  conversationSessions ConversationSession[]
+  knowledgeSources     KnowledgeSource[]
+  qas                  QA[]
 
   @@map("bots")
 }
@@ -70,6 +71,32 @@ model QA {
   @@map("qas")
 }
 
+model ConversationSession {
+  id        String    @id @default(cuid())
+  botId     String
+  clientId  String
+  title     String?   // عنوان الجلسة (أول سؤال أو ملخص)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  bot       Bot       @relation(fields: [botId], references: [id], onDelete: Cascade)
+  messages  Message[]
+
+  @@map("conversation_sessions")
+}
+
+model Message {
+  id                    String              @id @default(cuid())
+  conversationSessionId String
+  sender                String              // "user" or "bot"
+  content               String
+  responseType          String?             // "qa", "rag", "fallback" (للرسائل من البوت فقط)
+  createdAt             DateTime            @default(now())
+  conversationSession   ConversationSession @relation(fields: [conversationSessionId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+// الاحتفاظ بجدول المحادثات القديم للتوافق مع النظام الحالي
 model Conversation {
   id           String   @id @default(cuid())
   botId        String

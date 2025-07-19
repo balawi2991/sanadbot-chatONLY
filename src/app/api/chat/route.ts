@@ -206,8 +206,58 @@ export async function POST(request: NextRequest) {
       responseType = "fallback"
     }
     
-    // Save conversation
+    // Save conversation using new session system
     const saveStart = performance.now()
+    
+    // Find or create conversation session
+    let conversationSession = await prisma.conversationSession.findFirst({
+      where: {
+        botId: bot.id,
+        clientId: clientId || 'anonymous'
+      },
+      orderBy: {
+        updatedAt: 'desc'
+      }
+    })
+    
+    // Create new session if none exists or if last session is older than 1 hour
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
+    if (!conversationSession || conversationSession.updatedAt < oneHourAgo) {
+      conversationSession = await prisma.conversationSession.create({
+        data: {
+          botId: bot.id,
+          clientId: clientId || 'anonymous',
+          title: message.slice(0, 50) + (message.length > 50 ? '...' : '')
+        }
+      })
+    }
+    
+    // Save user message
+    await prisma.message.create({
+      data: {
+        conversationSessionId: conversationSession.id,
+        sender: 'user',
+        content: message
+      }
+    })
+    
+    // Save bot response
+    await prisma.message.create({
+      data: {
+        conversationSessionId: conversationSession.id,
+        sender: 'bot',
+        content: response,
+        responseType
+      }
+    })
+    
+    // Update session timestamp
+    await prisma.conversationSession.update({
+      where: { id: conversationSession.id },
+      data: { updatedAt: new Date() }
+    })
+    
+    // Also save to old conversation table for backward compatibility
     await prisma.conversation.create({
       data: {
         botId: bot.id,
@@ -217,6 +267,7 @@ export async function POST(request: NextRequest) {
         responseType
       }
     })
+    
     const saveEnd = performance.now()
     console.log('💾 [Database] حفظ المحادثة:', (saveEnd - saveStart).toFixed(2), 'ms')
     
