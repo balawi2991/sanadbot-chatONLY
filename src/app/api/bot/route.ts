@@ -58,7 +58,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const data = await request.json()
-    const { name, color, logo, avatar, placeholder, welcomeMessage, personality, isActive } = data
+    const { name, color, logo, avatar, placeholder, welcomeMessage, personality, isActive, glowEffect } = data
 
     const bot = await prisma.bot.update({
       where: {
@@ -72,7 +72,8 @@ export async function PUT(request: NextRequest) {
         ...(placeholder && { placeholder }),
         ...(welcomeMessage && { welcome: welcomeMessage }),
         ...(personality && { personality }),
-        ...(isActive !== undefined && { isActive })
+        ...(isActive !== undefined && { isActive }),
+        ...(glowEffect !== undefined && { glowEffect })
       }
     })
 

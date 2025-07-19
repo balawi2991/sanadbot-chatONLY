@@ -1,251 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختبار التطابق - البوت الأصلي مقابل المضمّن</title>
-    <style>
-        body {
-            font-family: 'Tajawal', sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            direction: rtl;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .header h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .header p {
-            color: #666;
-            font-size: 16px;
-        }
-        .comparison-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-        .section {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
-            border: 2px solid #e9ecef;
-        }
-        .section h2 {
-            color: #495057;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 20px;
-        }
-        .checklist {
-            background: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 30px;
-        }
-        .checklist h3 {
-            color: #dc3545;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        .check-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 8px;
-            border-radius: 5px;
-            background: #f8f9fa;
-        }
-        .check-item input[type="checkbox"] {
-            margin-left: 10px;
-            transform: scale(1.2);
-        }
-        .check-item label {
-            flex: 1;
-            cursor: pointer;
-        }
-        .instructions {
-            background: #e3f2fd;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-            border-right: 4px solid #2196f3;
-        }
-        .instructions h3 {
-            color: #1976d2;
-            margin-bottom: 10px;
-        }
-        .instructions ol {
-            margin: 0;
-            padding-right: 20px;
-        }
-        .instructions li {
-            margin-bottom: 8px;
-            line-height: 1.5;
-        }
-        .embed-demo {
-            min-height: 400px;
-            position: relative;
-        }
-        .status {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: #28a745;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: bold;
-            z-index: 1000;
-        }
-    </style>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div class="status">✅ الخادم يعمل - جاهز للاختبار</div>
-    
-    <div class="container">
-        <div class="header">
-            <h1>🔍 اختبار التطابق الكامل</h1>
-            <p>مقارنة شاملة بين البوت الأصلي والنسخة المضمّنة للتأكد من التطابق 100%</p>
-        </div>
-
-        <div class="instructions">
-            <h3>📋 تعليمات الاختبار:</h3>
-            <ol>
-                <li>افتح صفحة المظهر في تبويب منفصل: <strong>localhost:3002/dashboard/appearance</strong></li>
-                <li>قم بتغيير اللون الأساسي إلى لون مختلف (مثل الأحمر أو الأزرق)</li>
-                <li>غيّر نص المساعدة في حقل الإدخال إلى نص مخصص</li>
-                <li>احفظ التغييرات واختبر البوت في صفحة المعاينة</li>
-                <li>ارجع إلى هذه الصفحة وقارن النسخة المضمّنة أدناه</li>
-                <li>تأكد من تطابق جميع العناصر المذكورة في القائمة</li>
-            </ol>
-        </div>
-
-        <div class="comparison-grid">
-            <div class="section">
-                <h2>🎯 البوت الأصلي</h2>
-                <p style="text-align: center; color: #666; margin-bottom: 20px;">افتح صفحة المظهر للمقارنة</p>
-                <div style="text-align: center; padding: 40px; background: #e9ecef; border-radius: 10px; color: #6c757d;">
-                    <strong>localhost:3002/dashboard/appearance</strong><br>
-                    <small>اختبر البوت في صفحة المعاينة المباشرة</small>
-                </div>
-            </div>
-            
-            <div class="section">
-                <h2>📱 البوت المضمّن</h2>
-                <p style="text-align: center; color: #666; margin-bottom: 20px;">النسخة المضمّنة في هذه الصفحة</p>
-                <div class="embed-demo">
-                    <!-- البوت المضمّن سيظهر هنا -->
-                </div>
-            </div>
-        </div>
-
-        <div class="checklist">
-            <h3>✅ قائمة التحقق من التطابق:</h3>
-            
-            <div class="check-item">
-                <input type="checkbox" id="color-match">
-                <label for="color-match">اللون الأساسي يطابق تماماً في كلا النسختين</label>
-            </div>
-            
-            <div class="check-item">
-                <input type="checkbox" id="placeholder-match">
-                <label for="placeholder-match">نص المساعدة (placeholder) يطابق تماماً في كلا النسختين</label>
-            </div>
-            
-            <div class="check-item">
-                <input type="checkbox" id="placeholder-style">
-                <label for="placeholder-style">تنسيق نص المساعدة (لون رمادي) يطابق النسخة الأصلية</label>
-            </div>
-            
-            <div class="check-item">
-                <input type="checkbox" id="send-icon">
-                <label for="send-icon">أيقونة الإرسال تطابق تماماً النسخة الأصلية</label>
-            </div>
-            
-            <div class="check-item">
-                <input type="checkbox" id="send-button-color">
-                <label for="send-button-color">لون زر الإرسال يستخدم اللون المخصص من صفحة المظهر</label>
-            </div>
-            
-            <div class="check-item">
-                <input type="checkbox" id="user-message-color">
-                <label for="user-message-color">لون رسالة المستخدم يستخدم اللون المخصص من صفحة المظهر</label>
-            </div>
-            
-            <div class="check-item">
-                <input type="checkbox" id="bot-avatar-color">
-                <label for="bot-avatar-color">لون أيقونة البوت يستخدم اللون المخصص من صفحة المظهر</label>
-            </div>
-            
-            <div class="check-item">
-                <input type="checkbox" id="hover-effects">
-                <label for="hover-effects">تأثيرات التفاعل (hover) تعمل بنفس الطريقة في كلا النسختين</label>
-            </div>
-            
-            <div class="check-item">
-                <input type="checkbox" id="typing-indicator">
-                <label for="typing-indicator">مؤشر الكتابة يستخدم اللون المخصص</label>
-            </div>
-            
-            <div class="check-item">
-                <input type="checkbox" id="welcome-message">
-                <label for="welcome-message">رسالة الترحيب تطابق النص المخصص من صفحة المظهر</label>
-            </div>
-        </div>
-    </div>
-
-    <!-- تحميل البوت المضمّن -->
-    <script src="http://localhost:3002/embed.js"></script>
-    
-    <script>
-        // إضافة مؤشرات بصرية للاختبار
-        document.addEventListener('DOMContentLoaded', function() {
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const item = this.closest('.check-item');
-                    if (this.checked) {
-                        item.style.background = '#d4edda';
-                        item.style.borderColor = '#28a745';
-                    } else {
-                        item.style.background = '#f8f9fa';
-                        item.style.borderColor = 'transparent';
-                    }
-                });
-            });
-            
-            // تحديث حالة الاختبار
-            setInterval(() => {
-                const checkedCount = document.querySelectorAll('input[type="checkbox"]:checked').length;
-                const totalCount = checkboxes.length;
-                const status = document.querySelector('.status');
-                
-                if (checkedCount === totalCount) {
-                    status.textContent = '🎉 اكتمل الاختبار - تطابق كامل!';
-                    status.style.background = '#28a745';
-                } else {
-                    status.textContent = `✅ الخادم يعمل - ${checkedCount}/${totalCount} مكتمل`;
-                    status.style.background = '#17a2b8';
-                }
-            }, 1000);
-        });
-    </script>
-</body>
-</html>

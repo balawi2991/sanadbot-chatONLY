@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 
 // Initialize Gemini AI
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "AIzaSyCTWpfizB5kXGPgrtFuGgJtngsfjfqNim4")
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "AIzaSyCwhDop1HFDiGBGUPClIW6zIxouOI_Ohdg")
 
 // Function to find similar Q&A
 function findSimilarQA(question: string, qas: any[]) {
@@ -37,44 +37,89 @@ function findSimilarQA(question: string, qas: any[]) {
   return null
 }
 
-// Function to generate RAG response
-async function generateRAGResponse(question: string, bot: any, knowledgeSources: any[]) {
+// Function to generate RAG response with performance monitoring
+async function generateRAGResponse(question: string, bot: any, knowledgeSources: any[], conversationHistory: any[] = []) {
+  const performanceStart = performance.now()
+  console.log('🚀 [Gemini] بدء معالجة الطلب:', new Date().toISOString())
+  
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+    const setupStart = performance.now()
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        temperature: 0.7,
+        topP: 0.8,
+        maxOutputTokens: 1024,
+      }
+    })
+    const setupEnd = performance.now()
+    console.log('⚙️ [Gemini] إعداد النموذج:', (setupEnd - setupStart).toFixed(2), 'ms')
     
     // Prepare context from knowledge sources
+    const contextStart = performance.now()
     let context = ""
     knowledgeSources.forEach((source, index) => {
       context += `مصدر ${index + 1} (${source.title}):\n${source.content}\n\n`
     })
     
+    // Prepare conversation history for context
+    let historyContext = ""
+    if (conversationHistory.length > 0) {
+      historyContext = "\n\nسياق المحادثة السابقة:\n"
+      conversationHistory.slice(-3).forEach((conv, index) => {
+        historyContext += `المستخدم: ${conv.question}\nالمساعد: ${conv.answer}\n\n`
+      })
+    }
+    
+    const contextEnd = performance.now()
+    console.log('📝 [Gemini] إعداد السياق:', (contextEnd - contextStart).toFixed(2), 'ms')
+    console.log('📊 [Gemini] حجم السياق:', context.length + historyContext.length, 'حرف')
+    console.log('💬 [Gemini] عدد المحادثات السابقة:', conversationHistory.length)
+    
     // Prepare the prompt
     const prompt = `أنت مساعد ذكي اسمك "${bot.name}". شخصيتك: ${bot.personality}
 
 المعلومات المتاحة لديك:
-${context}
+${context}${historyContext}
 
-السؤال: ${question}
+السؤال الحالي: ${question}
 
 تعليمات:
-1. أجب على السؤال بناءً على المعلومات المتاحة فقط
+1. أجب على السؤال بناءً على المعلومات المتاحة والسياق السابق
 2. إذا لم تجد إجابة في المعلومات المتاحة، قل أنك لا تملك معلومات كافية
-3. كن مفيداً ومهذباً
+3. كن مفيداً ومهذباً واستخدم السياق السابق إذا كان مناسباً
 4. أجب باللغة العربية
 5. لا تذكر أنك تستخدم مصادر معرفية، فقط أجب بشكل طبيعي
 
 الإجابة:`
     
+    const apiStart = performance.now()
+    console.log('🌐 [Gemini] إرسال الطلب إلى API:', new Date().toISOString())
+    
     const result = await model.generateContent(prompt)
     const response = await result.response
+    
+    const apiEnd = performance.now()
+    const totalEnd = performance.now()
+    
+    console.log('✅ [Gemini] استلام الرد من API:', new Date().toISOString())
+    console.log('⏱️ [Gemini] زمن API:', (apiEnd - apiStart).toFixed(2), 'ms')
+    console.log('⏱️ [Gemini] الزمن الإجمالي:', (totalEnd - performanceStart).toFixed(2), 'ms')
+    console.log('📏 [Gemini] طول الرد:', response.text().length, 'حرف')
+    
     return response.text()
   } catch (error) {
-    console.error('Error generating RAG response:', error)
+    const errorEnd = performance.now()
+    console.error('❌ [Gemini] خطأ في المعالجة:', error)
+    console.log('⏱️ [Gemini] زمن الخطأ:', (errorEnd - performanceStart).toFixed(2), 'ms')
     return "عذراً، حدث خطأ أثناء معالجة سؤالك. يرجى المحاولة مرة أخرى."
   }
 }
 
 export async function POST(request: NextRequest) {
+  const requestStart = performance.now()
+  console.log('🎯 [Chat API] بدء معالجة الطلب:', new Date().toISOString())
+  
   try {
     const { message, botId, clientId } = await request.json()
     
@@ -93,6 +138,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Get bot with related data
+    const dbStart = performance.now()
     const bot = await prisma.bot.findUnique({
       where: { id: botId },
       include: {
@@ -102,6 +148,8 @@ export async function POST(request: NextRequest) {
         knowledgeSources: true
       }
     })
+    const dbEnd = performance.now()
+    console.log('🗄️ [Database] جلب بيانات البوت:', (dbEnd - dbStart).toFixed(2), 'ms')
     
     if (!bot) {
       return NextResponse.json(
@@ -117,25 +165,49 @@ export async function POST(request: NextRequest) {
       )
     }
     
+    // Get conversation history for context
+    const historyStart = performance.now()
+    const conversationHistory = await prisma.conversation.findMany({
+      where: {
+        botId: bot.id,
+        clientId: clientId || 'anonymous'
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: 5 // آخر 5 محادثات للسياق
+    })
+    const historyEnd = performance.now()
+    console.log('📚 [Database] جلب سياق المحادثة:', (historyEnd - historyStart).toFixed(2), 'ms')
+    console.log('💬 [Context] عدد المحادثات السابقة:', conversationHistory.length)
+    
     let response = ""
     let responseType = "fallback"
     
     // Step 1: Check for Q&A match
+    const qaStart = performance.now()
     const matchedQA = findSimilarQA(message, bot.qas)
+    const qaEnd = performance.now()
+    console.log('🔍 [Q&A Search] البحث في الأسئلة:', (qaEnd - qaStart).toFixed(2), 'ms')
+    
     if (matchedQA) {
+      console.log('✅ [Q&A] تم العثور على إجابة مطابقة')
       response = matchedQA.answer
       responseType = "qa"
     } else if (bot.knowledgeSources.length > 0) {
-      // Step 2: Use RAG with knowledge sources
-      response = await generateRAGResponse(message, bot, bot.knowledgeSources)
+      console.log('🤖 [RAG] استخدام Gemini مع مصادر المعرفة')
+      // Step 2: Use RAG with knowledge sources and conversation history
+      response = await generateRAGResponse(message, bot, bot.knowledgeSources, conversationHistory.reverse())
       responseType = "rag"
     } else {
+      console.log('⚠️ [Fallback] لا توجد مصادر معرفة متاحة')
       // Step 3: Fallback response
       response = "عذراً، لا أملك معلومات كافية للإجابة على سؤالك. يمكنك التواصل مع فريق الدعم للحصول على مساعدة أكثر تفصيلاً."
       responseType = "fallback"
     }
     
     // Save conversation
+    const saveStart = performance.now()
     await prisma.conversation.create({
       data: {
         botId: bot.id,
@@ -145,11 +217,22 @@ export async function POST(request: NextRequest) {
         responseType
       }
     })
+    const saveEnd = performance.now()
+    console.log('💾 [Database] حفظ المحادثة:', (saveEnd - saveStart).toFixed(2), 'ms')
+    
+    const requestEnd = performance.now()
+    console.log('🏁 [Chat API] انتهاء معالجة الطلب:', (requestEnd - requestStart).toFixed(2), 'ms')
+    console.log('📊 [Summary] نوع الاستجابة:', responseType)
     
     return NextResponse.json({
       response,
       responseType,
-      botName: bot.name
+      botName: bot.name,
+      performance: {
+        total: (requestEnd - requestStart).toFixed(2),
+        database: (dbEnd - dbStart + historyEnd - historyStart + saveEnd - saveStart).toFixed(2),
+        processing: responseType === 'rag' ? 'measured_in_generateRAGResponse' : (qaEnd - qaStart).toFixed(2)
+      }
     })
     
   } catch (error) {

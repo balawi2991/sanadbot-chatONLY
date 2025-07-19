@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import ChatWidget from '@/components/ChatWidget/ChatWidget'
+import ChatWidget from '@/components/ChatWidget'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 

@@ -3,7 +3,7 @@
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import Sidebar from "@/components/Sidebar"
+import Sidebar from "@/components/sidebar"
 
 export default function DashboardLayout({
   children,

@@ -1,243 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختبار التحسينات النهائية - بوت سند</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .comparison {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin: 30px 0;
-        }
-        .section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #007bff;
-        }
-        .section h3 {
-            color: #333;
-            margin-top: 0;
-        }
-        .improvements {
-            background: #e8f5e8;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            border-left: 4px solid #28a745;
-        }
-        .improvements h3 {
-            color: #155724;
-            margin-top: 0;
-        }
-        .test-checklist {
-            background: #fff3cd;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            border-left: 4px solid #ffc107;
-        }
-        .test-checklist h3 {
-            color: #856404;
-            margin-top: 0;
-        }
-        .checklist {
-            list-style: none;
-            padding: 0;
-        }
-        .checklist li {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .checklist li:before {
-            content: "☐ ";
-            color: #007bff;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-        .status {
-            background: #d1ecf1;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 4px solid #17a2b8;
-        }
-        .code-block {
-            background: #f4f4f4;
-            padding: 15px;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            margin: 10px 0;
-            overflow-x: auto;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🚀 اختبار التحسينات النهائية للبوت المضمن</h1>
-        
-        <div class="status">
-            <h3>📊 حالة الاختبار:</h3>
-            <p><strong>معرف البوت:</strong> cmd6zy2o3000mvpl85isweckl</p>
-            <p><strong>وقت الاختبار:</strong> <span id="testTime"></span></p>
-            <p><strong>الهدف:</strong> التأكد من تطابق البوت المضمن مع البوت الأساسي</p>
-        </div>
-
-        <div class="improvements">
-            <h3>✅ التحسينات المطبقة:</h3>
-            <ul>
-                <li><strong>زر الإرسال:</strong> يبدأ معطلاً ويتفعل عند الكتابة</li>
-                <li><strong>الشفافية:</strong> زر معطل بشفافية 50%، مفعل بشفافية 100%</li>
-                <li><strong>المؤشر:</strong> يتغير من "not-allowed" إلى "pointer"</li>
-                <li><strong>التفاعل:</strong> لا يتفاعل مع hover عندما معطل</li>
-                <li><strong>الأيقونة:</strong> ArrowUp مطابقة للبوت الأساسي</li>
-                <li><strong>إعادة التعيين:</strong> يعود للحالة المعطلة بعد الإرسال</li>
-            </ul>
-        </div>
-
-        <div class="comparison">
-            <div class="section">
-                <h3>🎯 البوت الأساسي (المرجع)</h3>
-                <ul>
-                    <li>زر الإرسال معطل بدون نص</li>
-                    <li>أيقونة ArrowUp من lucide-react</li>
-                    <li>شفافية 50% عند التعطيل</li>
-                    <li>لا يتفاعل مع hover عند التعطيل</li>
-                    <li>يتفعل فوراً عند الكتابة</li>
-                </ul>
-            </div>
-            
-            <div class="section">
-                <h3>🔧 البوت المضمن (محدث)</h3>
-                <ul>
-                    <li>✅ زر الإرسال معطل بدون نص</li>
-                    <li>✅ أيقونة ArrowUp مطابقة</li>
-                    <li>✅ شفافية 50% عند التعطيل</li>
-                    <li>✅ لا يتفاعل مع hover عند التعطيل</li>
-                    <li>✅ يتفعل فوراً عند الكتابة</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="test-checklist">
-            <h3>📋 قائمة الاختبار:</h3>
-            <ol class="checklist">
-                <li>افتح البوت وتحقق من أن زر الإرسال معطل في البداية</li>
-                <li>تحقق من أن الزر شفاف (opacity: 0.5)</li>
-                <li>حرك الماوس فوق الزر المعطل - يجب ألا يتفاعل</li>
-                <li>ابدأ بالكتابة في حقل الإدخال</li>
-                <li>تحقق من تفعيل الزر فوراً (opacity: 1)</li>
-                <li>تحقق من تغيير المؤشر إلى pointer</li>
-                <li>حرك الماوس فوق الزر المفعل - يجب أن يتفاعل</li>
-                <li>أرسل رسالة وتحقق من عودة الزر للحالة المعطلة</li>
-                <li>تحقق من أن الأيقونة هي ArrowUp</li>
-                <li>قارن مع البوت في صفحة المظهر</li>
-            </ol>
-        </div>
-
-        <div class="section">
-            <h3>🔍 التفاصيل التقنية:</h3>
-            <div class="code-block">
-                // حالة الزر المعطل
-                disabled: true
-                opacity: 0.5
-                cursor: not-allowed
-                
-                // حالة الزر المفعل
-                disabled: false
-                opacity: 1
-                cursor: pointer
-            </div>
-        </div>
-
-        <div class="section">
-            <h3>🎨 التخصيصات المطبقة:</h3>
-            <ul>
-                <li><strong>اسم البوت:</strong> "مساعد سند"</li>
-                <li><strong>اللون الأساسي:</strong> #EF4444 (أحمر)</li>
-                <li><strong>نص الإدخال:</strong> "اكتب رسالتك هنا..."</li>
-                <li><strong>رسالة الترحيب:</strong> "مرحباً! كيف يمكنني مساعدتك اليوم؟"</li>
-            </ul>
-        </div>
-
-        <p style="text-align: center; margin-top: 30px; color: #666; font-style: italic;">
-            🎯 الهدف: تحقيق تطابق كامل بين البوت المضمن والبوت الأساسي في جميع التفاعلات
-        </p>
-    </div>
-
-    <!-- تضمين بوت سند مع معرف البوت -->
-    <script 
-        src="http://localhost:3002/embed.js" 
-        data-bot-id="cmd6zy2o3000mvpl85isweckl"
-        async>
-    </script>
-
-    <script>
-        // عرض وقت الاختبار
-        document.getElementById('testTime').textContent = new Date().toLocaleString('ar-SA');
-        
-        // تسجيل معلومات التحميل
-        console.log('🧪 بدء اختبار التحسينات النهائية:', new Date().toISOString());
-        console.log('🔗 معرف البوت:', 'cmd6zy2o3000mvpl85isweckl');
-        
-        // مراقبة تحميل البوت
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                if (window.SanadBot) {
-                    console.log('✅ تم تحميل البوت بنجاح');
-                    console.log('📊 إعدادات البوت:', window.SanadBot.config);
-                    
-                    // اختبار حالة زر الإرسال
-                    setTimeout(function() {
-                        const sendButton = document.getElementById('sanadbot-send-btn');
-                        if (sendButton) {
-                            console.log('🔘 حالة زر الإرسال:');
-                            console.log('  - معطل:', sendButton.disabled);
-                            console.log('  - الشفافية:', sendButton.style.opacity);
-                            console.log('  - المؤشر:', sendButton.style.cursor);
-                        }
-                    }, 1000);
-                } else {
-                    console.log('❌ لم يتم تحميل البوت');
-                }
-            }, 2000);
-        });
-        
-        // مراقبة تغييرات حقل الإدخال
-        document.addEventListener('input', function(e) {
-            if (e.target.tagName === 'INPUT') {
-                const sendButton = document.getElementById('sanadbot-send-btn');
-                if (sendButton) {
-                    console.log('📝 تغيير في الإدخال:');
-                    console.log('  - النص:', e.target.value);
-                    console.log('  - الزر معطل:', sendButton.disabled);
-                    console.log('  - الشفافية:', sendButton.style.opacity);
-                }
-            }
-        });
-    </script>
-</body>
-</html>

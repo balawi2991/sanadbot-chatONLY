@@ -20,42 +20,41 @@ const WIDGET_STYLES = `
 }
 
 /* أنماط التوهج المتحرك - مطابقة للتصميم الأصلي */
-@keyframes sanadbot-border-flow {
+@keyframes sanadbot-strokeGlow {
   0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
 }
 
-@keyframes sanadbot-glow-pulse {
-  0%, 100% { filter: blur(3px) brightness(1); }
-  50% { filter: blur(4px) brightness(1.2); }
+@keyframes sanadbot-strokePulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
 }
 
 .sanadbot-widget-glow {
   position: relative;
+  z-index: 1;
 }
 
 .sanadbot-widget-glow::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, #fbbf24 0%, #f472b6 33%, #a78bfa 66%, #fbbf24 100%);
-  background-size: 300% 100%;
-  animation: sanadbot-border-flow 8s linear infinite, sanadbot-glow-pulse 3s ease-in-out infinite;
-  z-index: -1;
-  opacity: 0.9;
-}
-
-.sanadbot-widget-glow::after {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: 9999px;
-  background: #1e1e1e;
-  z-index: -1;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 8px rgba(251, 191, 36, 0.3), 0 0 12px rgba(244, 114, 182, 0.2);
-}
+          content: "";
+          position: absolute;
+          inset: -3px;
+          border-radius: 9999px;
+          background: linear-gradient(270deg, #ff00cc, #3333ff, #00ffff, #ff00cc);
+          background-size: 300% 300%;
+          animation: sanadbot-strokeGlow 5s linear infinite, sanadbot-strokePulse 3s ease-in-out infinite;
+          z-index: -1;
+          filter: blur(1px);
+        }
+        
+        .sanadbot-widget-glow::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: 9999px;
+          background: #1e1e1e;
+          z-index: -1;
+        }
 
 /* أنماط مؤشر الكتابة - مطابقة للتصميم الأصلي */
 @keyframes sanadbot-typing-dots {
@@ -84,29 +83,29 @@ const WIDGET_STYLES = `
 /* أنماط المودال - مطابقة للتصميم الأصلي */
 .sanadbot-modal-glow {
   position: relative;
+  z-index: 1;
 }
 
 .sanadbot-modal-glow::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: 1rem;
-  background: linear-gradient(90deg, #fbbf24 0%, #f472b6 33%, #a78bfa 66%, #fbbf24 100%);
-  background-size: 300% 100%;
-  animation: sanadbot-border-flow 8s linear infinite, sanadbot-glow-pulse 3s ease-in-out infinite;
-  z-index: -1;
-  opacity: 0.7;
-}
-
-.sanadbot-modal-glow::after {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: 1rem;
-  background: linear-gradient(to bottom, #1e1e1e, #2a2a2a);
-  z-index: -1;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 8px rgba(251, 191, 36, 0.3), 0 0 12px rgba(244, 114, 182, 0.2);
-}
+          content: "";
+          position: absolute;
+          inset: -3px;
+          border-radius: 1rem;
+          background: linear-gradient(270deg, #ff00cc, #3333ff, #00ffff, #ff00cc);
+          background-size: 300% 300%;
+          animation: sanadbot-strokeGlow 5s linear infinite, sanadbot-strokePulse 3s ease-in-out infinite;
+          z-index: -1;
+          filter: blur(1px);
+        }
+        
+        .sanadbot-modal-glow::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: 1rem;
+          background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 50%, #1e1e1e 100%);
+          z-index: -1;
+        }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
@@ -140,7 +139,7 @@ const WIDGET_STYLES = `
 // أيقونات SVG - مطابقة تماماً للتصميم الأصلي (Lucide React)
 const WIDGET_ICONS = {
   message: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>',
-  arrowUp: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"></path></svg>',
+  arrowUp: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"></path><path d="M12 19V5"></path></svg>',
   close: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
   bot: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2" ry="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>',
   user: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>'
@@ -158,7 +157,8 @@ export function generateWidgetScript(bot: BotConfig, apiBaseUrl: string): string
     avatar: bot.avatar,
     placeholder: bot.placeholder,
     welcomeMessage: bot.welcomeMessage,
-    personality: bot.personality
+    personality: bot.personality,
+    glowEffect: bot.glowEffect
   }
 
   return `
@@ -273,7 +273,7 @@ export function generateWidgetScript(bot: BotConfig, apiBaseUrl: string): string
     \`;
 
     container.innerHTML = \`
-      <div class="sanadbot-widget-glow">
+      <div class="\${BOT_CONFIG.glowEffect !== false ? 'sanadbot-widget-glow' : ''}">
         <div style="
           width: 320px;
           height: 56px;
@@ -320,7 +320,8 @@ export function generateWidgetScript(bot: BotConfig, apiBaseUrl: string): string
             "
             onclick="event.stopPropagation()"
             onkeypress="SanadBot.handleKeyPress(event)"
-            oninput="SanadBot.updateInput(this.value)"
+            oninput="SanadBot.handleInputChange(this.value)"
+            onfocus="SanadBot.handleInputFocus()"
           />
           
           <!-- زر الإرسال -->
@@ -390,7 +391,7 @@ export function generateWidgetScript(bot: BotConfig, apiBaseUrl: string): string
     \`;
 
     modal.innerHTML = \`
-      <div class="sanadbot-modal-glow">
+      <div class="\${BOT_CONFIG.glowEffect !== false ? 'sanadbot-modal-glow' : ''}">
         <div style="
           background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 50%, #1e1e1e 100%);
           border-radius: 1rem;
@@ -774,6 +775,24 @@ export function generateWidgetScript(bot: BotConfig, apiBaseUrl: string): string
     }
   }
 
+  // دالة جديدة للتعامل مع تغيير النص وفتح المودال تلقائياً
+  function handleInputChange(value) {
+    updateInput(value);
+    
+    // فتح المودال تلقائياً عند بدء الكتابة
+    if (value.trim().length > 0 && !isModalOpen) {
+      openModal();
+    }
+  }
+
+  // دالة جديدة للتعامل مع التركيز على حقل الإدخال
+  function handleInputFocus() {
+    // فتح المودال تلقائياً عند التركيز على حقل الإدخال
+    if (!isModalOpen) {
+      openModal();
+    }
+  }
+
   // إنشاء الواجهة
   async function init() {
     console.log('SanadBot: Initializing widget...');
@@ -819,6 +838,8 @@ export function generateWidgetScript(bot: BotConfig, apiBaseUrl: string): string
     toggleModal: toggleModal,
     handleKeyPress: handleKeyPress,
     updateInput: updateInput,
+    handleInputChange: handleInputChange,
+    handleInputFocus: handleInputFocus,
     isOpen: function() { return isModalOpen; },
     config: BOT_CONFIG,
     version: '2.1.0',

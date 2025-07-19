@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextRequest, NextResponse } from "next/server"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
 
 export async function GET(
   request: NextRequest,
@@ -7,18 +9,27 @@ export async function GET(
 ) {
   try {
     const { botId } = await params
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { message: "غير مصرح" },
+        { status: 401 }
+      )
+    }
 
     if (!botId) {
       return NextResponse.json(
-        { error: 'معرف البوت مطلوب' },
+        { message: "معرف البوت مطلوب" },
         { status: 400 }
       )
     }
 
-    // البحث عن البوت بمعرف البوت
-    const bot = await prisma.bot.findUnique({
+    // البحث عن البوت بواسطة ID والتأكد من أنه يخص المستخدم الحالي
+    const bot = await prisma.bot.findFirst({
       where: {
-        id: botId
+        id: botId,
+        userId: session.user.id
       },
       include: {
         _count: {
@@ -33,29 +44,16 @@ export async function GET(
 
     if (!bot) {
       return NextResponse.json(
-        { error: 'البوت غير موجود' },
+        { message: "البوت غير موجود" },
         { status: 404 }
       )
     }
 
-    // إرجاع بيانات البوت
-    return NextResponse.json({
-      id: bot.id,
-      name: bot.name,
-      color: bot.color,
-      logo: bot.logo,
-      avatar: bot.avatar,
-      placeholder: bot.placeholder,
-      welcomeMessage: bot.welcome,
-      personality: bot.personality,
-      isActive: bot.isActive,
-      _count: bot._count
-    })
-
+    return NextResponse.json(bot)
   } catch (error) {
-    console.error('Error fetching bot:', error)
+    console.error("Error fetching bot by ID:", error)
     return NextResponse.json(
-      { error: 'حدث خطأ في الخادم' },
+      { message: "حدث خطأ في الخادم" },
       { status: 500 }
     )
   }

@@ -1,26 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import WidgetBar from './WidgetBar';
-import WidgetExpanded from './WidgetExpanded';
-
-interface Message {
-  id: string;
-  text: string;
-  sender: 'user' | 'bot';
-  timestamp: Date;
-}
-
-interface BotConfig {
-  name?: string;
-  color?: string;
-  logo?: string;
-  avatar?: string;
-  placeholder?: string;
-  welcomeMessage?: string;
-  personality?: string;
-}
+import WidgetBar from './widgetbar';
+import WidgetExpanded from './widgetexpanded';
+import { widgetCore, BotConfig, Message, createClientId } from '@/lib/widget-core';
 
 interface ChatWidgetProps {
   botId?: string;
@@ -33,9 +17,22 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ botId, config, isEmbedded = fal
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [botConfig, setBotConfig] = useState<BotConfig | null>(config || null);
+  const [clientId] = useState(() => createClientId(botId || 'demo', 'react'));
 
   // التحقق من وجود البوت في iframe (للتضمين)
   const isInIframe = typeof window !== 'undefined' && window.parent !== window;
+
+  // تحميل إعدادات البوت عند التحميل
+  useEffect(() => {
+    if (botId && !config) {
+      widgetCore.loadBotConfig(botId).then(loadedConfig => {
+        if (loadedConfig) {
+          setBotConfig(loadedConfig);
+        }
+      });
+    }
+  }, [botId, config]);
 
   const handleToggleModal = () => {
     if (isInIframe && isModalOpen) {
@@ -46,6 +43,12 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ botId, config, isEmbedded = fal
     }
   };
 
+  const handleOpenModal = () => {
+    if (!isModalOpen) {
+      setIsModalOpen(true);
+    }
+  };
+
   const handleInputChange = (value: string) => {
     setInputValue(value);
   };
@@ -53,15 +56,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ botId, config, isEmbedded = fal
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
-    // إضافة رسالة المستخدم
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: inputValue,
-      sender: 'user',
-      timestamp: new Date()
-    };
-
-    const currentMessage = inputValue;
+    const userMessage = widgetCore.createMessage(inputValue, 'user');
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsTyping(true);
@@ -72,48 +67,25 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ botId, config, isEmbedded = fal
     }
 
     try {
-      // إرسال الرسالة إلى API
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: currentMessage,
-          botId: botId || 'demo', // استخدام botId المرسل أو demo للمعاينة
-          clientId: 'widget-preview'
-        })
-      });
+      const response = await widgetCore.sendMessage(
+        inputValue,
+        botId || 'demo',
+        clientId
+      );
+      
+      const botMessage = widgetCore.createMessage(
+        response.response || 'عذراً، لم أتمكن من فهم رسالتك.',
+        'bot'
+      );
 
-      if (response.ok) {
-        const data = await response.json();
-        const botMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          text: data.response,
-          sender: 'bot',
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, botMessage]);
-      } else {
-        // رد احتياطي في حالة الخطأ
-        const botMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          text: config?.welcomeMessage || 'عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.',
-          sender: 'bot',
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, botMessage]);
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
-      // رد احتياطي في حالة الخطأ
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: config?.welcomeMessage || 'عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.',
-        sender: 'bot',
-        timestamp: new Date()
-      };
       setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error('خطأ في إرسال الرسالة:', error);
+      const errorMessage = widgetCore.createMessage(
+        'عذراً، حدث خطأ في إرسال الرسالة. يرجى المحاولة مرة أخرى.',
+        'bot'
+      );
+      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsTyping(false);
     }
@@ -126,7 +98,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ botId, config, isEmbedded = fal
         onClose={() => {}} // لا حاجة للإغلاق في التضمين
         messages={messages}
         isTyping={isTyping}
-        config={config}
+        config={botConfig || config}
         isEmbedded={true}
         inputValue={inputValue}
         onInputChange={handleInputChange}
@@ -139,12 +111,13 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ botId, config, isEmbedded = fal
     <>
       {/* الشريط السفلي - ثابت دائماً */}
       <WidgetBar
-        onToggleModal={handleToggleModal}
-        inputValue={inputValue}
-        onInputChange={handleInputChange}
-        onSendMessage={handleSendMessage}
-        config={config}
-      />
+          onToggleModal={handleToggleModal}
+          onOpenModal={handleOpenModal}
+          inputValue={inputValue}
+          onInputChange={handleInputChange}
+          onSendMessage={handleSendMessage}
+          config={botConfig || config}
+        />
       
       {/* المودال - يظهر فوق الشريط */}
       <AnimatePresence>
@@ -153,7 +126,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ botId, config, isEmbedded = fal
             onClose={handleToggleModal}
             messages={messages}
             isTyping={isTyping}
-            config={config}
+            config={botConfig || config}
           />
         )}
       </AnimatePresence>

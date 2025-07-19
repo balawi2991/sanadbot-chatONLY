@@ -16,10 +16,10 @@ export async function GET() {
     // Get user's bot
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: { bots: true }
+      include: { bot: true }
     })
 
-    if (!user || user.bots.length === 0) {
+    if (!user || !user.bot) {
       return NextResponse.json({ 
         total: 0,
         qa: 0,
@@ -28,7 +28,7 @@ export async function GET() {
       })
     }
 
-    const botId = user.bots[0].id
+    const botId = user.bot.id
 
     // Get conversation stats
     const [total, qa, rag, fallback] = await Promise.all([

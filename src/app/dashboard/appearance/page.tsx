@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
-import ChatWidgetPreview from "@/components/ChatWidget/ChatWidgetPreview"
+import { ChatWidgetPreview } from "@/components/ChatWidget"
 
 interface BotData {
   id: string
@@ -23,14 +23,15 @@ export default function AppearancePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [formData, setFormData] = useState({
-    name: "",
-    color: "#3B82F6",
-    logo: "",
-    avatar: "",
-    placeholder: "",
-    welcomeMessage: "",
-    personality: "",
-    isActive: true
+    name: '',
+    color: '#3B82F6',
+    logo: '',
+    avatar: '',
+    placeholder: '',
+    welcomeMessage: '',
+    personality: '',
+    isActive: true,
+    glowEffect: true
   })
   const [hasChanges, setHasChanges] = useState(false)
   const [originalData, setOriginalData] = useState<any>(null)
@@ -55,7 +56,8 @@ export default function AppearancePage() {
           placeholder: data.placeholder || "",
           welcomeMessage: data.welcome || "",
           personality: data.personality || "",
-          isActive: data.isActive
+          isActive: data.isActive,
+          glowEffect: data.glowEffect ?? true
         }
         setFormData(initialFormData)
         setOriginalData(initialFormData)
@@ -326,6 +328,33 @@ export default function AppearancePage() {
               />
             </div>
           </div>
+
+          {/* Glow Effect Setting */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  تأثير التوهج البصري
+                </label>
+                <p className="text-sm text-gray-500">
+                  تفعيل التأثير المتحرك حول إطار البوت
+                </p>
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="glowEffect"
+                  name="glowEffect"
+                  checked={formData.glowEffect}
+                  onChange={handleInputChange}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="glowEffect" className="mr-2 block text-sm text-gray-900">
+                  تفعيل التوهج
+                </label>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Status */}
@@ -431,7 +460,8 @@ export default function AppearancePage() {
                 avatar: formData.avatar,
                 placeholder: formData.placeholder || "اسألني أي شيء...",
                 welcomeMessage: formData.welcomeMessage || "مرحباً! كيف يمكنني مساعدتك؟",
-                personality: formData.personality
+                personality: formData.personality,
+                glowEffect: formData.glowEffect
               }}
             />
           </div>

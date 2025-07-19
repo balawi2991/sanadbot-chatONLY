@@ -1,46 +1,22 @@
-# دليل التضمين الشامل - Complete Embedding Guide
+# دليل التضمين التقني - Technical Embedding Guide
 
 ## نظرة عامة
-هذا الدليل يشرح بالتفصيل كيفية عمل نظام تضمين بوت سند، وكيفية ضمان التطابق الكامل بين البوت في لوحة التحكم والبوت المضمن في المواقع الخارجية.
+هذا الدليل التقني يشرح التفاصيل الداخلية لنظام التضمين وآلية توليد الكود المخصص.
 
-## 1. هيكل النظام - System Architecture
+**ملاحظة**: للحصول على دليل التكامل الشامل، راجع `SanadBot-Integration-Guide.md`
 
-### المكونات الأساسية
-```
-Sanad Bot Embedding System
-├── Frontend Components
-│   ├── ChatWidget.tsx (الأصلي)
-│   ├── WidgetBar.tsx
-│   ├── WidgetExpanded.tsx
-│   └── styles.css
-├── Backend API
-│   ├── /api/widget/[botId]/route.ts (مولد الكود)
-│   ├── /api/chat (معالج المحادثة)
-│   └── Database (بيانات البوت)
-├── Embedding Files
-│   ├── embed.js (سكريبت التضمين)
-│   └── Generated Widget Code (كود مخصص لكل عميل)
-└── Client Website
-    └── <script src="embed.js"></script>
-```
+## التفاصيل التقنية لآلية التضمين
 
-### تدفق البيانات
-```
-1. العميل يضع embed.js في موقعه
-2. embed.js يقرأ data-bot-id من HTML
-3. يرسل طلب إلى /api/widget/[botId]
-4. الخادم يجلب بيانات البوت من قاعدة البيانات
-5. يولد كود JavaScript مخصص للعميل
-6. يتم تحميل الكود وعرض البوت
-7. البوت يرسل الرسائل إلى /api/chat مع معرف العميل
-```
-
-## 2. آلية التضمين - Embedding Mechanism
-
-### 2.1 ملف embed.js
+### ملف embed.js المحسن
 ```javascript
-// ملف embed.js الأساسي
+// ملف embed.js مع معالجة أخطاء محسنة
 (function() {
+  // منع التحميل المتكرر
+  if (window.SanadBotWidgetLoaded) {
+    console.log('SanadBot widget already loaded');
+    return;
+  }
+
   // البحث عن عنصر HTML مع data-bot-id
   const embedElement = document.querySelector('[data-bot-id]');
   if (!embedElement) {
@@ -48,77 +24,92 @@ Sanad Bot Embedding System
     return;
   }
 
-  // استخراج معرف البوت
+  // استخراج معرف البوت والإعدادات
   const botId = embedElement.getAttribute('data-bot-id');
+  const apiBase = embedElement.getAttribute('data-api-base') || window.location.origin;
+  const isLazy = embedElement.getAttribute('data-lazy') === 'true';
+
   if (!botId) {
     console.error('Sanad Bot: معرف البوت مطلوب');
     return;
   }
 
-  // تحديد الخادم الأساسي
-  const API_BASE = embedElement.getAttribute('data-api-base') || 'https://sanad-bot.com';
+  // دالة تحميل البوت
+  function loadWidget() {
+    const script = document.createElement('script');
+    script.src = `${apiBase}/api/widget/${botId}`;
+    script.async = true;
+    script.onload = () => {
+      window.SanadBotWidgetLoaded = true;
+      console.log('SanadBot widget loaded successfully');
+    };
+    script.onerror = () => {
+      console.error('Sanad Bot: فشل في تحميل البوت');
+    };
+    
+    document.head.appendChild(script);
+  }
 
-  // تحميل كود البوت المخصص
-  const script = document.createElement('script');
-  script.src = `${API_BASE}/api/widget/${botId}`;
-  script.async = true;
-  script.onerror = function() {
-    console.error('Sanad Bot: فشل في تحميل البوت');
-  };
-  
-  document.head.appendChild(script);
+  // تحميل فوري أو متأخر
+  if (isLazy) {
+    // تحميل عند التفاعل الأول
+    const events = ['mouseenter', 'click', 'touchstart'];
+    const loadOnce = () => {
+      loadWidget();
+      events.forEach(event => 
+        document.removeEventListener(event, loadOnce)
+      );
+    };
+    events.forEach(event => 
+      document.addEventListener(event, loadOnce, { passive: true })
+    );
+  } else {
+    loadWidget();
+  }
 })();
-```
-
-### 2.2 استخدام embed.js في المواقع
-```html
-<!-- الطريقة الأساسية -->
-<div data-bot-id="bot_123456"></div>
-<script src="https://sanad-bot.com/embed.js"></script>
-
-<!-- مع تخصيص الخادم -->
-<div data-bot-id="bot_123456" data-api-base="https://custom-domain.com"></div>
-<script src="https://sanad-bot.com/embed.js"></script>
-
-<!-- تحميل متأخر -->
-<div data-bot-id="bot_123456" data-lazy="true"></div>
-<script src="https://sanad-bot.com/embed.js"></script>
 ```
 
 ## 3. مولد الكود المخصص - Custom Code Generator
 
-### 3.1 ملف route.ts
+### 3.1 ملف route.ts المحسن
 ```typescript
-// /api/widget/[botId]/route.ts
+// /api/widget/[botId]/route.ts - معالج محسن مع تخزين مؤقت وأمان
 export async function GET(request: Request, { params }: { params: { botId: string } }) {
+  // التحقق من صحة معرف البوت
+  if (!params.botId || typeof params.botId !== 'string') {
+    return new Response('معرف البوت غير صحيح', { status: 400 });
+  }
+  
   try {
-    // 1. جلب بيانات البوت من قاعدة البيانات
-    const botData = await getBotData(params.botId);
+    // 1. جلب بيانات البوت مع التحقق من الحالة النشطة
+    const botData = await getBotData(params.botId, { includeActive: true });
     
-    if (!botData) {
-      return new Response('البوت غير موجود', { status: 404 });
+    if (!botData || !botData.isActive) {
+      return new Response('البوت غير موجود أو غير نشط', { status: 404 });
     }
 
-    // 2. إنشاء تكوين البوت
+    // 2. إنشاء تكوين البوت مع تنظيف البيانات
     const BOT_CONFIG = {
       id: botData.id,
-      name: botData.name || 'مساعد سند',
+      name: (botData.name || 'مساعد سند').replace(/["'<>]/g, ''),
       color: botData.color || '#1e1e1e',
       placeholder: botData.placeholder || 'اسألني أي شيء...',
       welcomeMessage: botData.welcomeMessage || 'مرحباً بك!',
       personality: botData.personality || '',
       logo: botData.logo || null,
-      avatar: botData.avatar || null
+      avatar: botData.avatar || null,
+      apiBase: process.env.NEXT_PUBLIC_API_URL || request.url.split('/api')[0]
     };
 
-    // 3. توليد الكود المخصص
-    const widgetCode = generateWidgetCode(BOT_CONFIG);
+    // 3. توليد الكود المحسن
+    const widgetCode = generateOptimizedWidgetCode(BOT_CONFIG);
     
     return new Response(widgetCode, {
       headers: {
-        'Content-Type': 'application/javascript',
-        'Cache-Control': 'public, max-age=300', // 5 دقائق
-        'Access-Control-Allow-Origin': '*'
+        'Content-Type': 'application/javascript; charset=utf-8',
+        'Cache-Control': 'public, max-age=1800, stale-while-revalidate=3600',
+        'Access-Control-Allow-Origin': '*',
+        'ETag': `"${params.botId}-${Date.now()}"`
       }
     });
   } catch (error) {
@@ -128,11 +119,19 @@ export async function GET(request: Request, { params }: { params: { botId: strin
 }
 ```
 
-### 3.2 دالة توليد الكود
+### 3.2 دالة توليد الكود المحسن
 ```typescript
-function generateWidgetCode(BOT_CONFIG: BotConfig): string {
+function generateOptimizedWidgetCode(BOT_CONFIG: BotConfig): string {
   return `
     (function() {
+      'use strict';
+      
+      // منع التحميل المتكرر
+      if (window.SanadBot_${BOT_CONFIG.id}) {
+        console.log('SanadBot already initialized');
+        return;
+      }
+      
       // تكوين البوت الخاص بالعميل
       const BOT_CONFIG = ${JSON.stringify(BOT_CONFIG)};
       
@@ -142,7 +141,7 @@ function generateWidgetCode(BOT_CONFIG: BotConfig): string {
       let isTyping = false;
       let inputValue = '';
       
-      // الأيقونات SVG
+      // الأيقونات SVG المحسنة
       const icons = {
         message: '${getMessageIcon()}',
         send: '${getSendIcon()}',
@@ -152,21 +151,26 @@ function generateWidgetCode(BOT_CONFIG: BotConfig): string {
         close: '${getCloseIcon()}'
       };
       
-      // CSS الأنيميشن
-      const styles = \`${getAnimationStyles()}\`;
+      // CSS الأنيميشن المحسن
+      const styles = \`${getOptimizedAnimationStyles()}\`;
       
-      // إضافة الأنماط إلى الصفحة
+      // إضافة الأنماط إلى الصفحة مع تحسينات الأداء
       const styleSheet = document.createElement('style');
       styleSheet.textContent = styles;
+      styleSheet.setAttribute('data-sanad-widget', BOT_CONFIG.id);
       document.head.appendChild(styleSheet);
       
-      // دوال البوت
-      ${getWidgetFunctions()}
+      // دوال البوت المحسنة
+      ${getOptimizedWidgetFunctions()}
       
-      // تهيئة البوت
-      init();
+      // تهيئة البوت مع معالجة الأخطاء
+      try {
+        init();
+      } catch (error) {
+        console.error('خطأ في تهيئة بوت سند:', error);
+      }
       
-      // API خارجي
+      // API خارجي محسن
       window.SanadBot = {
         open: openModal,
         close: closeModal,
@@ -181,65 +185,91 @@ function generateWidgetCode(BOT_CONFIG: BotConfig): string {
         },
         getMessages: function() {
           return [...messages];
+        },
+        isReady: function() {
+          return !!window.SanadBot_${BOT_CONFIG.id};
         }
       };
+      
+      // تسجيل التحميل الناجح
+      window.SanadBot_${BOT_CONFIG.id} = true;
     })();
   `;
 }
 ```
 
-## 4. ضمان البيانات الخاصة بالعميل - Client-Specific Data
+## آليات الحماية وضمان البيانات
 
-### 4.1 معرفات فريدة
-```javascript
-// في الكود المولد
-const clientId = 'widget-embed-' + BOT_CONFIG.id;
-const agentId = BOT_CONFIG.id;
-
-// في طلبات API
-fetch(API_BASE + '/api/chat', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    message: messageText,
-    botId: BOT_CONFIG.id,        // معرف البوت
-    clientId: clientId,          // معرف العميل الفريد
-    agentId: agentId,           // معرف الوكيل
-    sessionId: generateSessionId() // معرف الجلسة
-  })
-});
-```
-
-### 4.2 عزل البيانات
+### حماية API والتحقق من الصلاحيات
 ```typescript
-// في /api/chat
-export async function POST(request: Request) {
-  const { message, botId, clientId, agentId } = await request.json();
-  
-  // التحقق من صحة المعرفات
-  if (!botId || !clientId || !agentId) {
-    return Response.json({ error: 'معرفات مطلوبة' }, { status: 400 });
-  }
-  
-  // جلب بيانات البوت الخاصة بالعميل فقط
-  const botData = await getBotByIdAndAgent(botId, agentId);
-  
-  if (!botData) {
-    return Response.json({ error: 'البوت غير موجود' }, { status: 404 });
-  }
-  
-  // معالجة الرسالة باستخدام بيانات العميل فقط
-  const response = await processMessage({
-    message,
-    botConfig: botData,
-    clientId,
-    agentId,
-    knowledgeBase: botData.knowledgeBase, // قاعدة معرفة خاصة
-    personality: botData.personality,      // شخصية خاصة
-    context: await getClientContext(clientId) // سياق خاص
+// دالة التحقق من صحة البوت وصلاحيات الوصول
+async function validateBotAccess(botId: string) {
+  const bot = await prisma.bot.findFirst({
+    where: { 
+      id: botId,
+      isActive: true,
+      user: { isActive: true }
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          plan: true,
+          isActive: true,
+          usageStats: true
+        }
+      },
+      knowledgeSources: {
+        where: { isActive: true },
+        select: { id: true, title: true, type: true }
+      },
+      qas: {
+        where: { isActive: true },
+        select: { id: true, question: true, answer: true }
+      }
+    }
   });
-  
-  return Response.json({ response });
+
+  if (!bot) return null;
+
+  // التحقق من حدود الخطة
+  const planLimits = getPlanLimits(bot.user.plan);
+  if (!planLimits.allowEmbedding) {
+    throw new Error('التضمين غير مسموح في هذه الخطة');
+  }
+
+  return bot;
+}
+
+// دالة إنشاء تكوين آمن للبوت
+function createSafeConfig(bot: any) {
+  return {
+    id: bot.id,
+    name: sanitizeString(bot.name),
+    color: bot.color || '#007bff',
+    placeholder: sanitizeString(bot.placeholder),
+    welcomeMessage: sanitizeString(bot.welcomeMessage),
+    apiEndpoint: `/api/chat/${bot.id}`,
+    // إحصائيات عامة فقط - بدون بيانات حساسة
+    stats: {
+      knowledgeSourcesCount: bot.knowledgeSources?.length || 0,
+      qasCount: bot.qas?.length || 0
+    },
+    features: {
+      fileUpload: bot.allowFileUpload || false,
+      voiceInput: bot.allowVoiceInput || false
+    }
+  };
+}
+
+// دالة تنظيف النصوص من المحتوى الضار
+function sanitizeString(input: string): string {
+  if (!input) return '';
+  return input
+    .replace(/[<>"']/g, '') // إزالة HTML tags والاقتباسات
+    .replace(/javascript:/gi, '') // إزالة JavaScript URLs
+    .trim()
+    .substring(0, 200); // تحديد الطول الأقصى
 }
 ```
 
@@ -715,14 +745,66 @@ function diagnoseSanadBot() {
 }
 ```
 
-## الخلاصة
+### تتبع الاستخدام والإحصائيات
+```typescript
+// تسجيل التفاعلات مع معالجة الأخطاء
+async function logInteraction(data: {
+  botId: string;
+  action: string;
+  sessionId?: string;
+  metadata?: any;
+}) {
+  try {
+    await prisma.interaction.create({
+      data: {
+        botId: data.botId,
+        action: data.action,
+        sessionId: data.sessionId,
+        timestamp: new Date(),
+        metadata: {
+          ...data.metadata,
+          source: 'embedded_widget'
+        }
+      }
+    });
+  } catch (error) {
+    console.error('خطأ في تسجيل التفاعل:', error);
+    // لا نوقف العملية في حالة فشل التسجيل
+  }
+}
 
-هذا النظام يضمن:
+// إحصائيات الاستخدام المحسنة
+async function getUsageStats(botId: string, period: number = 30) {
+  const startDate = new Date(Date.now() - period * 24 * 60 * 60 * 1000);
+  
+  const stats = await prisma.interaction.groupBy({
+    by: ['action'],
+    where: {
+      botId: botId,
+      timestamp: { gte: startDate }
+    },
+    _count: { action: true },
+    _max: { timestamp: true }
+  });
+  
+  return {
+    period: `${period} days`,
+    totalInteractions: stats.reduce((sum, stat) => sum + stat._count.action, 0),
+    breakdown: stats,
+    lastActivity: stats.length > 0 ? Math.max(...stats.map(s => s._max.timestamp?.getTime() || 0)) : null
+  };
+}
+```
 
-1. **التطابق الكامل** بين البوت الأصلي والمضمن
-2. **عزل البيانات** لكل عميل
-3. **الأمان والموثوقية** في التشغيل
-4. **سهولة الصيانة** والتطوير
-5. **الأداء المحسن** والتحميل السريع
+---
 
-النظام مصمم ليكون قابلاً للتوسع والصيانة، مع ضمان عدم وجود أي اختلافات بين تجربة العميل في لوحة التحكم وفي موقعه الخاص.
+## الخلاصة التقنية
+
+يوفر هذا الدليل التقني المعلومات الأساسية لفهم آلية التضمين في Sanad Bot:
+
+✅ **آلية التضمين المحسنة** مع منع التحميل المتكرر  
+✅ **API محسن** مع تخزين مؤقت وحماية من XSS  
+✅ **حماية البيانات** وعزل المعلومات الحساسة  
+✅ **تتبع الاستخدام** مع معالجة أخطاء شاملة  
+
+**للحصول على دليل التكامل الشامل والأمثلة العملية، راجع:** `SanadBot-Integration-Guide.md`

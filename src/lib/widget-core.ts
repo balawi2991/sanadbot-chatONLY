@@ -16,6 +16,7 @@ export interface BotConfig {
   welcomeMessage: string
   personality: string
   isActive: boolean
+  glowEffect: boolean
 }
 
 export interface Message {
@@ -76,7 +77,8 @@ export class WidgetCore {
         placeholder: bot.placeholder,
         welcomeMessage: bot.welcome,
         personality: bot.personality,
-        isActive: bot.isActive
+        isActive: bot.isActive,
+        glowEffect: bot.glowEffect
       }
 
       // تحديث الكاش بالبيانات الجديدة

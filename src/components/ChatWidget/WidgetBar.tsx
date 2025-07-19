@@ -16,6 +16,7 @@ interface BotConfig {
 
 interface WidgetBarProps {
   onToggleModal: () => void;
+  onOpenModal: () => void;
   inputValue: string;
   onInputChange: (value: string) => void;
   onSendMessage: () => void;
@@ -24,6 +25,7 @@ interface WidgetBarProps {
 
 const WidgetBar: React.FC<WidgetBarProps> = ({
   onToggleModal,
+  onOpenModal,
   inputValue,
   onInputChange,
   onSendMessage,
@@ -45,6 +47,21 @@ const WidgetBar: React.FC<WidgetBarProps> = ({
 
   const handleBarClick = () => {
     onToggleModal();
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    onInputChange(value);
+    
+    // فتح المودال تلقائياً عند بدء الكتابة
+    if (value.trim().length > 0) {
+      onOpenModal();
+    }
+  };
+
+  const handleInputFocus = () => {
+    // فتح المودال تلقائياً عند التركيز على حقل الإدخال
+    onOpenModal();
   };
 
   const primaryColor = config?.color || '#1e1e1e';
@@ -72,8 +89,9 @@ const WidgetBar: React.FC<WidgetBarProps> = ({
             <input
               type="text"
               value={inputValue}
-              onChange={(e) => onInputChange(e.target.value)}
+              onChange={handleInputChange}
               onKeyPress={handleKeyPress}
+              onFocus={handleInputFocus}
               placeholder={placeholder}
               className="w-full bg-transparent border-none outline-none text-white placeholder-gray-400 font-medium text-sm selection:bg-white/20"
               style={{ fontFamily: 'Tajawal, sans-serif' }}

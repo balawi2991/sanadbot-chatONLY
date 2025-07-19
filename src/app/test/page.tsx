@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import ChatWidget from '@/components/ChatWidget/ChatWidget'
+import ChatWidget from '@/components/ChatWidget'
 
 const TestPage = () => {
   const [config] = useState({

@@ -21,6 +21,7 @@ interface BotConfig {
   placeholder?: string;
   welcomeMessage?: string;
   personality?: string;
+  glowEffect?: boolean;
 }
 
 interface ChatWidgetPreviewProps {
@@ -170,7 +171,7 @@ const ChatWidgetPreview: React.FC<ChatWidgetPreviewProps> = ({ botId, config }) 
         <div className="absolute inset-0 transform scale-85 origin-bottom-right">
           {/* شريط البوت في الأسفل - تحت المودال */}
           <div className="absolute bottom-6 left-8 z-10">
-            <div className="widget-glow">
+            <div className={config?.glowEffect !== false ? "widget-glow" : ""}>
               <div 
                 className="w-80 h-14 bg-[#1e1e1e] rounded-full shadow-2xl flex items-center px-4 gap-3 backdrop-blur-sm border border-white/10 cursor-pointer"
                 onClick={handleToggleModal}

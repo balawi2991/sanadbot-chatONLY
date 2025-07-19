@@ -24,17 +24,17 @@ export async function GET(request: NextRequest) {
     // Get user's bot
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: { bots: true }
+      include: { bot: true }
     })
 
-    if (!user || user.bots.length === 0) {
+    if (!user || !user.bot) {
       return NextResponse.json({ 
         conversations: [], 
         pagination: { page, limit, total: 0, pages: 0 } 
       })
     }
 
-    const botId = user.bots[0].id
+    const botId = user.bot.id
 
     // Build where clause
     const where: any = {

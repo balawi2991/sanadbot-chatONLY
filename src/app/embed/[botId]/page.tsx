@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
-import ChatWidget from "@/components/ChatWidget/ChatWidget"
+import ChatWidget from "@/components/ChatWidget"
 
 interface BotConfig {
   id: string
