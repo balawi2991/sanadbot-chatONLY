@@ -99,7 +99,7 @@ const WidgetExpanded: React.FC<WidgetExpandedProps> = ({
         </div>
         
         {/* منطقة المحادثة */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-transparent to-black/5">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-transparent to-black/5 chat-scroll-area">
           {messages.length === 0 ? (
             <div className="text-center text-gray-400 mt-8">
               <div 
@@ -270,7 +270,7 @@ const WidgetExpanded: React.FC<WidgetExpandedProps> = ({
             </div>
             
             {/* منطقة المحادثة */}
-            <div className="h-96 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-transparent to-black/5">
+            <div className="h-96 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-transparent to-black/5 chat-scroll-area">
               {messages.length === 0 ? (
                 <div className="text-center text-gray-400 mt-8">
                   <div 

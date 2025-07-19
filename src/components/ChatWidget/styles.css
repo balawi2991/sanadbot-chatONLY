@@ -105,3 +105,17 @@
 .typing-dot:nth-child(3) {
   animation-delay: 0;
 }
+
+/* أنماط شريط التمرير للبوت */
+.chat-scroll-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-scroll-area::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.4); /* slate-500 بتدرج */
+  border-radius: 6px;
+}
+
+.chat-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}

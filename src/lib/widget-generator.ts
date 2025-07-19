@@ -54,6 +54,20 @@ const WIDGET_STYLES = `
           z-index: -1;
         }
 
+/* أنماط شريط التمرير للبوت */
+.chat-scroll-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-scroll-area::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.4);
+  border-radius: 6px;
+}
+
+.chat-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 /* أنماط مؤشر الكتابة - مطابقة للتصميم الأصلي */
 @keyframes sanadbot-typing-dots {
   0%, 60%, 100% { transform: translateY(0); }
@@ -470,7 +484,7 @@ export function generateWidgetScript(bot: BotConfig, apiBaseUrl: string): string
           </div>
           
           <!-- منطقة المحادثة -->
-          <div id="sanadbot-messages" style="
+          <div id="sanadbot-messages" class="chat-scroll-area" style="
             height: 384px;
             overflow-y: auto;
             padding: 16px;

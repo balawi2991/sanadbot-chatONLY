@@ -106,6 +106,21 @@ export default function Sidebar({ isOpen, setIsOpen, session, onSignOut }: Sideb
           <nav className="flex-1 px-4 py-6 space-y-1">
             {navigation.map((item) => {
               const isActive = pathname === item.href
+              const isAnalytics = item.name === "التحليلات"
+              
+              if (isAnalytics) {
+                return (
+                  <div
+                    key={item.name}
+                    className="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 relative text-muted-foreground cursor-not-allowed opacity-60"
+                    title="قريباً"
+                  >
+                    <item.icon className="w-4 h-4 ml-3 transition-colors duration-200 text-[#64748B]" />
+                    <span className="transition-colors duration-200 font-medium">{item.name} (قريباً)</span>
+                  </div>
+                )
+              }
+              
               return (
                 <Link
                   key={item.name}
