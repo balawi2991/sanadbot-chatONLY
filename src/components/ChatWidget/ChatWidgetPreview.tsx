@@ -170,7 +170,7 @@ const ChatWidgetPreview: React.FC<ChatWidgetPreviewProps> = ({ botId, config }) 
         {/* البوت مع تصغير بسيط */}
         <div className="absolute inset-0 transform scale-85 origin-bottom-right">
           {/* شريط البوت في الأسفل - تحت المودال */}
-          <div className="absolute bottom-6 left-8 z-10">
+          <div className="absolute bottom-6 left-25 z-10">
             <div className={config?.glowEffect !== false ? "widget-glow" : ""}>
               <div 
                 className="w-80 h-14 bg-[#1e1e1e] rounded-full shadow-2xl flex items-center px-4 gap-3 backdrop-blur-sm border border-white/10 cursor-pointer"
@@ -220,7 +220,7 @@ const ChatWidgetPreview: React.FC<ChatWidgetPreviewProps> = ({ botId, config }) 
           {/* المودال - يظهر فوق الشريط داخل الحاوية */}
           <AnimatePresence>
             {isModalOpen && (
-              <div className="absolute bottom-24 left-8 z-20">
+              <div className="absolute bottom-24 left-16 z-20">
                 <div className="relative">
                   <div className="bg-gradient-to-br from-[#1e1e1e] via-[#2a2a2a] to-[#1e1e1e] rounded-2xl shadow-2xl border border-white/10 overflow-hidden backdrop-blur-sm w-96">
                     {/* الهيدر */}

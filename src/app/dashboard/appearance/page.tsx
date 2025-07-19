@@ -223,7 +223,7 @@ export default function AppearancePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         {/* نموذج التخصيص */}
-        <div className="lg:col-span-3 space-y-6">
+        <div className="lg:col-span-2 space-y-6">
           <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Settings */}
         <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#6366f1]/20">
@@ -464,7 +464,7 @@ export default function AppearancePage() {
         </div>
 
         {/* المعاينة المباشرة - sticky */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-3">
           <div className="sticky top-8">
             <ChatWidgetPreview 
               botId={botData?.id}
