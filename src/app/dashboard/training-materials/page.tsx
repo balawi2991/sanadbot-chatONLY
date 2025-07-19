@@ -3,6 +3,13 @@
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Badge } from "@/components/ui/badge"
+import { HeaderSkeleton, CardSkeleton, FormSkeleton, TableRowSkeleton } from "@/components/ui/skeleton"
+import { BookOpen, FileText, Link, Upload, Trash2, Plus, ExternalLink } from "lucide-react"
 
 interface KnowledgeSource {
   id: string
@@ -178,23 +185,11 @@ export default function TrainingMaterials() {
   const getTypeIcon = (type: string) => {
     switch (type) {
       case "file":
-        return (
-          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-        )
+        return <FileText className="w-5 h-5 text-blue-600" />
       case "link":
-        return (
-          <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-          </svg>
-        )
+        return <Link className="w-5 h-5 text-green-600" />
       case "text":
-        return (
-          <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
-          </svg>
-        )
+        return <FileText className="w-5 h-5 text-purple-600" />
       default:
         return null
     }
@@ -202,63 +197,78 @@ export default function TrainingMaterials() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">جاري التحميل...</p>
+      <div className="space-y-8">
+        {/* Header Skeleton */}
+        <HeaderSkeleton />
+        
+        {/* Add Sources Section Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
         </div>
+        
+        {/* Existing Sources Skeleton */}
+        <CardSkeleton className="min-h-[400px]" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">مصادر المعرفة</h1>
-          <p className="mt-2 text-gray-600">
-            أضف المحتوى الذي تريد أن يتعلم منه مساعدك الذكي
-          </p>
+    <div className="space-y-8">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-[#6366f1]/5 via-[#8b5cf6]/5 to-[#06b6d4]/5 rounded-[24px] p-8 border border-[#e1e7ef]/50">
+        <div className="flex items-center gap-4 mb-3">
+          <div className="w-12 h-12 bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] rounded-[12px] flex items-center justify-center">
+            <BookOpen className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] bg-clip-text text-transparent">مصادر المعرفة</h1>
+            <p className="text-[#64748b] text-lg font-medium">أضف المحتوى الذي تريد أن يتعلم منه مساعدك الذكي</p>
+          </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* إضافة مصادر جديدة */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">إضافة مصدر جديد</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* إضافة مصادر جديدة */}
+        <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#6366f1]/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Plus className="w-5 h-5" />
+                إضافة مصدر جديد
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
               
               {/* Tabs */}
               <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-6">
-                <button
+                <Button
+                  variant={activeTab === "text" ? "default" : "ghost"}
+                  size="sm"
                   onClick={() => setActiveTab("text")}
-                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                    activeTab === "text"
-                      ? "bg-white text-blue-600 shadow"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
+                  className="flex-1"
                 >
+                  <FileText className="w-4 h-4 mr-2" />
                   نص مباشر
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant={activeTab === "link" ? "default" : "ghost"}
+                  size="sm"
                   onClick={() => setActiveTab("link")}
-                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                    activeTab === "link"
-                      ? "bg-white text-blue-600 shadow"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
+                  className="flex-1"
                 >
+                  <Link className="w-4 h-4 mr-2" />
                   رابط
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant={activeTab === "file" ? "default" : "ghost"}
+                  size="sm"
                   onClick={() => setActiveTab("file")}
-                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                    activeTab === "file"
-                      ? "bg-white text-blue-600 shadow"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
+                  className="flex-1"
                 >
+                  <Upload className="w-4 h-4 mr-2" />
                   ملف
-                </button>
+                </Button>
               </div>
 
               {/* Text Form */}
@@ -268,11 +278,10 @@ export default function TrainingMaterials() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       عنوان النص
                     </label>
-                    <input
+                    <Input
                       type="text"
                       value={textForm.title}
                       onChange={(e) => setTextForm({ ...textForm, title: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="مثال: معلومات عن الشركة"
                       required
                     />
@@ -281,22 +290,21 @@ export default function TrainingMaterials() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       المحتوى
                     </label>
-                    <textarea
+                    <Textarea
                       value={textForm.content}
                       onChange={(e) => setTextForm({ ...textForm, content: e.target.value })}
                       rows={8}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="اكتب المحتوى الذي تريد أن يتعلم منه البوت..."
                       required
                     />
                   </div>
-                  <button
+                  <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-2 px-4 rounded-md font-medium transition-colors"
+                    className="w-full"
                   >
                     {isSubmitting ? "جاري الإضافة..." : "إضافة النص"}
-                  </button>
+                  </Button>
                 </form>
               )}
 
@@ -307,11 +315,10 @@ export default function TrainingMaterials() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       عنوان الرابط
                     </label>
-                    <input
+                    <Input
                       type="text"
                       value={linkForm.title}
                       onChange={(e) => setLinkForm({ ...linkForm, title: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="مثال: صفحة الخدمات"
                       required
                     />
@@ -320,22 +327,21 @@ export default function TrainingMaterials() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       الرابط
                     </label>
-                    <input
+                    <Input
                       type="url"
                       value={linkForm.url}
                       onChange={(e) => setLinkForm({ ...linkForm, url: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="https://example.com/page"
                       required
                     />
                   </div>
-                  <button
+                  <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-2 px-4 rounded-md font-medium transition-colors"
+                    className="w-full"
                   >
                     {isSubmitting ? "جاري الإضافة..." : "إضافة الرابط"}
-                  </button>
+                  </Button>
                 </form>
               )}
 
@@ -346,11 +352,10 @@ export default function TrainingMaterials() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       عنوان الملف
                     </label>
-                    <input
+                    <Input
                       type="text"
                       value={fileForm.title}
                       onChange={(e) => setFileForm({ ...fileForm, title: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="مثال: دليل المستخدم"
                       required
                     />
@@ -359,10 +364,9 @@ export default function TrainingMaterials() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       الملف
                     </label>
-                    <input
+                    <Input
                       type="file"
                       onChange={(e) => setFileForm({ ...fileForm, file: e.target.files?.[0] || null })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       accept=".txt,.pdf,.doc,.docx,.md"
                       required
                     />
@@ -370,30 +374,31 @@ export default function TrainingMaterials() {
                       الملفات المدعومة: TXT, PDF, DOC, DOCX, MD
                     </p>
                   </div>
-                  <button
+                  <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-2 px-4 rounded-md font-medium transition-colors"
+                    className="w-full"
                   >
                     {isSubmitting ? "جاري الرفع..." : "رفع الملف"}
-                  </button>
+                  </Button>
                 </form>
               )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          {/* قائمة المصادر الموجودة */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+        {/* قائمة المصادر الموجودة */}
+        <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#6366f1]/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5" />
                 المصادر الموجودة ({knowledgeSources.length})
-              </h2>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
               
               {knowledgeSources.length === 0 ? (
                 <div className="text-center py-8">
-                  <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
+                  <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500">لا توجد مصادر معرفة بعد</p>
                   <p className="text-sm text-gray-400 mt-1">
                     ابدأ بإضافة محتوى ليتعلم منه مساعدك الذكي
@@ -423,7 +428,8 @@ export default function TrainingMaterials() {
                               {source.type === "link" && source.url && (
                                 <>
                                   <span>•</span>
-                                  <a href={source.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                  <a href={source.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex items-center gap-1">
+                                    <ExternalLink className="w-3 h-3" />
                                     فتح الرابط
                                   </a>
                                 </>
@@ -436,22 +442,21 @@ export default function TrainingMaterials() {
                             )}
                           </div>
                         </div>
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleDelete(source.id)}
-                          className="flex-shrink-0 text-red-600 hover:text-red-800 transition-colors"
+                          className="flex-shrink-0 text-red-600 hover:text-red-800"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-            </div>
-          </div>
-        </div>
+            </CardContent>
+          </Card>
       </div>
     </div>
   )

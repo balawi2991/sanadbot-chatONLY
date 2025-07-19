@@ -4,6 +4,13 @@ import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
 import { ChatWidgetPreview } from "@/components/ChatWidget"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Badge } from "@/components/ui/badge"
+import { HeaderSkeleton, CardSkeleton, FormSkeleton } from "@/components/ui/skeleton"
+import { Palette, Save, RotateCcw, Settings, Eye, Sparkles } from "lucide-react"
 
 interface BotData {
   id: string
@@ -177,94 +184,111 @@ export default function AppearancePage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="space-y-8">
+        {/* Header Skeleton */}
+        <HeaderSkeleton />
+        
+        {/* Settings Cards Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <CardSkeleton />
+            <CardSkeleton />
+          </div>
+          <CardSkeleton />
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="w-full px-4 lg:px-6 xl:px-8">
-      <div className="mb-4">
-        <h1 className="text-3xl font-bold text-gray-900">تخصيص المظهر</h1>
-        <p className="mt-2 text-gray-600">قم بتخصيص مظهر وسلوك المساعد الذكي الخاص بك</p>
+    <div className="space-y-8">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-[#6366f1]/5 via-[#8b5cf6]/5 to-[#06b6d4]/5 rounded-[24px] p-8 border border-[#e1e7ef]/50">
+        <div className="flex items-center gap-4 mb-3">
+          <div className="w-12 h-12 bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] rounded-[12px] flex items-center justify-center">
+            <Palette className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] bg-clip-text text-transparent">تخصيص المظهر</h1>
+            <p className="text-[#64748b] text-lg font-medium">قم بتخصيص مظهر وسلوك المساعد الذكي الخاص بك</p>
+          </div>
+        </div>
+        {hasChanges && (
+          <Badge variant="warning" className="mt-2">
+            <Sparkles className="w-4 h-4 ml-1" />
+            يوجد تغييرات غير محفوظة
+          </Badge>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 xl:gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         {/* نموذج التخصيص */}
         <div className="lg:col-span-3 space-y-6">
           <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Settings */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">الإعدادات الأساسية</h2>
+        <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#6366f1]/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="w-5 h-5" />
+              الإعدادات الأساسية
+            </CardTitle>
+            <CardDescription>
+              قم بتعديل الاسم والرسائل الأساسية للمساعد
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                اسم المساعد
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="مثال: مساعد العملاء"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="placeholder" className="block text-sm font-medium text-gray-700 mb-2">
-                نص المساعدة في حقل الإدخال
-              </label>
-              <input
-                type="text"
-                id="placeholder"
-                name="placeholder"
-                value={formData.placeholder}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="مثال: اكتب رسالتك هنا..."
-              />
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <label htmlFor="welcomeMessage" className="block text-sm font-medium text-gray-700 mb-2">
-              رسالة الترحيب
-            </label>
-            <textarea
-              id="welcomeMessage"
-              name="welcomeMessage"
-              value={formData.welcomeMessage}
+            <Input
+              label="اسم المساعد"
+              name="name"
+              value={formData.name}
               onChange={handleInputChange}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="مثال: مرحباً! كيف يمكنني مساعدتك اليوم؟"
+              placeholder="مثال: مساعد العملاء"
+              required
+            />
+
+            <Input
+              label="نص المساعدة في حقل الإدخال"
+              name="placeholder"
+              value={formData.placeholder}
+              onChange={handleInputChange}
+              placeholder="مثال: اكتب رسالتك هنا..."
             />
           </div>
 
-          <div className="mt-6">
-            <label htmlFor="personality" className="block text-sm font-medium text-gray-700 mb-2">
-              شخصية المساعد
-            </label>
-            <textarea
-              id="personality"
-              name="personality"
-              value={formData.personality}
-              onChange={handleInputChange}
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="صف شخصية المساعد وطريقة تفاعله مع العملاء..."
-            />
-          </div>
-        </div>
+          <Textarea
+            label="رسالة الترحيب"
+            name="welcomeMessage"
+            value={formData.welcomeMessage}
+            onChange={handleInputChange}
+            rows={3}
+            placeholder="مثال: مرحباً! كيف يمكنني مساعدتك اليوم؟"
+          />
+
+          <Textarea
+            label="شخصية المساعد"
+            name="personality"
+            value={formData.personality}
+            onChange={handleInputChange}
+            rows={4}
+            placeholder="صف شخصية المساعد وطريقة تفاعله مع العملاء..."
+          />
+          </CardContent>
+        </Card>
 
         {/* Appearance Settings */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">إعدادات المظهر</h2>
+        <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#6366f1]/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Palette className="w-5 h-5" />
+              إعدادات المظهر
+            </CardTitle>
+            <CardDescription>
+              قم بتخصيص الألوان والشعارات والمظهر العام
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
           
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -298,35 +322,23 @@ export default function AppearancePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="logo" className="block text-sm font-medium text-gray-700 mb-2">
-                رابط الشعار (اختياري)
-              </label>
-              <input
-                type="url"
-                id="logo"
-                name="logo"
-                value={formData.logo}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="https://example.com/logo.png"
-              />
-            </div>
+            <Input
+              label="رابط الشعار (اختياري)"
+              type="url"
+              name="logo"
+              value={formData.logo}
+              onChange={handleInputChange}
+              placeholder="https://example.com/logo.png"
+            />
 
-            <div>
-              <label htmlFor="avatar" className="block text-sm font-medium text-gray-700 mb-2">
-                رابط صورة المساعد (اختياري)
-              </label>
-              <input
-                type="url"
-                id="avatar"
-                name="avatar"
-                value={formData.avatar}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="https://example.com/avatar.png"
-              />
-            </div>
+            <Input
+              label="رابط صورة المساعد (اختياري)"
+              type="url"
+              name="avatar"
+              value={formData.avatar}
+              onChange={handleInputChange}
+              placeholder="https://example.com/avatar.png"
+            />
           </div>
 
           {/* Glow Effect Setting */}
@@ -355,96 +367,99 @@ export default function AppearancePage() {
               </div>
             </div>
           </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Status */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">حالة المساعد</h2>
+        <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#6366f1]/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="w-5 h-5" />
+              حالة المساعد
+            </CardTitle>
+            <CardDescription>
+              تحكم في تفعيل وإلغاء تفعيل المساعد الذكي
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
           
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="isActive"
-              name="isActive"
-              checked={formData.isActive}
-              onChange={handleInputChange}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label htmlFor="isActive" className="mr-2 block text-sm text-gray-900">
-              تفعيل المساعد الذكي
-            </label>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="isActive"
+                name="isActive"
+                checked={formData.isActive}
+                onChange={handleInputChange}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="isActive" className="mr-2 block text-sm text-gray-900">
+                تفعيل المساعد الذكي
+              </label>
+            </div>
+            <Badge variant={formData.isActive ? 'success' : 'destructive'}>
+              {formData.isActive ? 'نشط' : 'غير نشط'}
+            </Badge>
           </div>
           <p className="mt-2 text-sm text-gray-600">
             عند إلغاء التفعيل، لن يظهر المساعد في موقعك الإلكتروني
           </p>
-        </div>
+          </CardContent>
+        </Card>
 
             {/* Save Buttons */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4 space-x-reverse">
-                  {hasChanges && (
-                    <div className="flex items-center text-amber-600">
-                      <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                      </svg>
-                      <span className="text-sm font-medium">لديك تغييرات غير محفوظة</span>
-                    </div>
-                  )}
-                  {!hasChanges && originalData && (
-                    <div className="flex items-center text-green-600">
-                      <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-sm font-medium">جميع التغييرات محفوظة</span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="flex space-x-3 space-x-reverse">
-                  {hasChanges && (
-                    <button
-                      type="button"
-                      onClick={handleReset}
-                      disabled={isSaving}
-                      className="bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 text-white px-4 py-2 rounded-md font-medium transition-colors flex items-center"
-                    >
-                      <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      </svg>
-                      إلغاء التغييرات
-                    </button>
-                  )}
-                  
-                  <button
-                    type="submit"
-                    disabled={isSaving || !hasChanges}
-                    className={`px-6 py-2 rounded-md font-medium transition-all flex items-center ${
-                      hasChanges
-                        ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    } disabled:bg-blue-400`}
-                  >
-                    {isSaving ? (
-                      <>
-                        <svg className="animate-spin w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        جاري الحفظ...
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                        </svg>
-                        حفظ التغييرات
-                      </>
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4 space-x-reverse">
+                    {hasChanges && (
+                      <Badge variant="warning" className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4" />
+                        لديك تغييرات غير محفوظة
+                      </Badge>
                     )}
-                  </button>
+                    {!hasChanges && originalData && (
+                      <Badge variant="success" className="flex items-center gap-2">
+                        <Eye className="w-4 h-4" />
+                        جميع التغييرات محفوظة
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  <div className="flex space-x-3 space-x-reverse">
+                    {hasChanges && (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={handleReset}
+                        disabled={isSaving}
+                      >
+                        <RotateCcw className="w-4 h-4 ml-2" />
+                        إلغاء التغييرات
+                      </Button>
+                    )}
+                    
+                    <Button
+                      type="submit"
+                      disabled={isSaving || !hasChanges}
+                      variant={hasChanges ? 'default' : 'secondary'}
+                    >
+                      {isSaving ? (
+                        <>
+                          <div className="animate-spin w-4 h-4 ml-2 border-2 border-white border-t-transparent rounded-full"></div>
+                          جاري الحفظ...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-4 h-4 ml-2" />
+                          حفظ التغييرات
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </form>
         </div>
 

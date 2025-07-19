@@ -3,6 +3,13 @@
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
+import { HeaderSkeleton, CardSkeleton, FormSkeleton, TableRowSkeleton } from '@/components/ui/skeleton'
+import { HelpCircle, Plus, Edit, Trash2, ToggleLeft, ToggleRight, Info, CheckCircle, X } from 'lucide-react'
 
 interface QA {
   id: string
@@ -135,11 +142,18 @@ export default function QAPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">جاري التحميل...</p>
+      <div className="space-y-8">
+        {/* Header Skeleton */}
+        <HeaderSkeleton />
+        
+        {/* Main Content Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <CardSkeleton className="lg:col-span-1" />
+          <CardSkeleton className="lg:col-span-2 min-h-[500px]" />
         </div>
+        
+        {/* Additional Info Skeleton */}
+        <CardSkeleton />
       </div>
     )
   }
@@ -147,49 +161,48 @@ export default function QAPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">الأسئلة والأجوبة</h1>
-          <p className="mt-2 text-gray-600">
-            أضف أسئلة وأجوبة محددة مسبقاً للرد السريع دون استخدام الذكاء الاصطناعي
-          </p>
-        </div>
+        <div className="space-y-8">
+          {/* Header Section */}
+          <div className="bg-gradient-to-r from-[#6366f1]/5 via-[#8b5cf6]/5 to-[#06b6d4]/5 rounded-[24px] p-8 border border-[#e1e7ef]/50">
+            <div className="flex items-center gap-4 mb-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] rounded-[12px] flex items-center justify-center">
+                <HelpCircle className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] bg-clip-text text-transparent">الأسئلة والأجوبة</h1>
+                <p className="text-[#64748b] text-lg font-medium">أضف أسئلة وأجوبة محددة مسبقاً للرد السريع دون استخدام الذكاء الاصطناعي</p>
+              </div>
+            </div>
+          </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* نموذج إضافة/تعديل */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* نموذج إضافة/تعديل */}
+            <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#6366f1]/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                {editingId ? <Edit className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                 {editingId ? "تعديل السؤال" : "إضافة سؤال جديد"}
-              </h2>
-              
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    السؤال
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.question}
-                    onChange={(e) => setFormData({ ...formData, question: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="مثال: ما هي ساعات العمل؟"
-                    required
-                  />
-                </div>
+                <Input
+                  label="السؤال"
+                  type="text"
+                  value={formData.question}
+                  onChange={(e) => setFormData({ ...formData, question: e.target.value })}
+                  placeholder="مثال: ما هي ساعات العمل؟"
+                  required
+                />
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    الإجابة
-                  </label>
-                  <textarea
-                    value={formData.answer}
-                    onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
-                    rows={6}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="اكتب الإجابة المحددة لهذا السؤال..."
-                    required
-                  />
-                </div>
+                <Textarea
+                  label="الإجابة"
+                  value={formData.answer}
+                  onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
+                  rows={6}
+                  placeholder="اكتب الإجابة المحددة لهذا السؤال..."
+                  required
+                />
 
                 <div className="flex items-center">
                   <input
@@ -205,33 +218,37 @@ export default function QAPage() {
                 </div>
 
                 <div className="flex space-x-3 space-x-reverse">
-                  <button
+                  <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-2 px-4 rounded-md font-medium transition-colors"
+                    className="flex-1"
                   >
                     {isSubmitting ? "جاري الحفظ..." : (editingId ? "تحديث السؤال" : "إضافة السؤال")}
-                  </button>
+                  </Button>
                   {editingId && (
-                    <button
+                    <Button
                       type="button"
+                      variant="outline"
                       onClick={handleCancelEdit}
-                      className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
                     >
+                      <X className="w-4 h-4 ml-1" />
                       إلغاء
-                    </button>
+                    </Button>
                   )}
                 </div>
               </form>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          {/* قائمة الأسئلة والأجوبة */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+            {/* قائمة الأسئلة والأجوبة */}
+            <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#6366f1]/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <HelpCircle className="w-5 h-5" />
                 الأسئلة الموجودة ({qas.length})
-              </h2>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
               
               {qas.length === 0 ? (
                 <div className="text-center py-8">
@@ -250,52 +267,34 @@ export default function QAPage() {
                       qa.isActive ? 'border-gray-200 bg-white' : 'border-gray-100 bg-gray-50'
                     }`}>
                       <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center space-x-2 space-x-reverse">
-                          <div className={`w-3 h-3 rounded-full ${
-                            qa.isActive ? 'bg-green-500' : 'bg-gray-400'
-                          }`}></div>
-                          <span className={`text-xs font-medium ${
-                            qa.isActive ? 'text-green-700' : 'text-gray-500'
-                          }`}>
-                            {qa.isActive ? 'نشط' : 'غير نشط'}
-                          </span>
-                        </div>
+                        <Badge variant={qa.isActive ? 'success' : 'secondary'}>
+                          {qa.isActive ? 'نشط' : 'غير نشط'}
+                        </Badge>
                         <div className="flex items-center space-x-1 space-x-reverse">
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => handleToggleActive(qa.id, qa.isActive)}
-                            className={`p-1 rounded transition-colors ${
-                              qa.isActive 
-                                ? 'text-yellow-600 hover:bg-yellow-50' 
-                                : 'text-green-600 hover:bg-green-50'
-                            }`}
                             title={qa.isActive ? 'إلغاء التفعيل' : 'تفعيل'}
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              {qa.isActive ? (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728" />
-                              ) : (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              )}
-                            </svg>
-                          </button>
-                          <button
+                            {qa.isActive ? <ToggleLeft className="w-4 h-4" /> : <ToggleRight className="w-4 h-4" />}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => handleEdit(qa)}
-                            className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                             title="تعديل"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
-                          <button
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => handleDelete(qa.id)}
-                            className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
                             title="حذف"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
                       </div>
                       
@@ -322,25 +321,38 @@ export default function QAPage() {
                   ))}
                 </div>
               )}
-            </div>
-          </div>
-        </div>
+            </CardContent>
+          </Card>
 
-        {/* معلومات إضافية */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <div className="flex items-start">
-            <svg className="w-6 h-6 text-blue-600 mt-1 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div>
-              <h3 className="text-lg font-medium text-blue-900 mb-2">كيف تعمل الأسئلة والأجوبة؟</h3>
-              <div className="text-blue-800 space-y-2">
-                <p>• عندما يطرح زائر سؤالاً مطابقاً أو مشابهاً لأحد الأسئلة المحفوظة، سيتم الرد بالإجابة المحددة مسبقاً</p>
-                <p>• هذا يضمن ردوداً سريعة ودقيقة دون الحاجة لاستخدام الذكاء الاصطناعي</p>
-                <p>• يمكنك تفعيل أو إلغاء تفعيل أي سؤال حسب الحاجة</p>
-                <p>• الأسئلة غير النشطة لن تظهر في ردود البوت</p>
-              </div>
-            </div>
+            {/* معلومات إضافية */}
+            <Card className="mt-8 bg-gradient-to-r from-[#06b6d4]/5 to-[#3b82f6]/5 border-[#06b6d4]/20 hover:shadow-lg transition-all duration-300">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-[#0891b2]">
+                  <Info className="w-5 h-5" />
+                  كيف تعمل ميزة الأسئلة والأجوبة؟
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-[#0e7490] space-y-2">
+                  <p className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    عندما يسأل المستخدم سؤالاً، سيبحث النظام أولاً في قاعدة الأسئلة والأجوبة المحددة مسبقاً
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    إذا وُجد تطابق، سيتم عرض الإجابة المحددة مسبقاً
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    إذا لم يوجد تطابق، سيتم استخدام الذكاء الاصطناعي للإجابة
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    يمكنك تفعيل أو إلغاء تفعيل أي سؤال وجواب حسب الحاجة
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

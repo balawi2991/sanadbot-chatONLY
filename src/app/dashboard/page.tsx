@@ -3,6 +3,11 @@
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { HeaderSkeleton, StatCardSkeleton, CardSkeleton } from "@/components/ui/skeleton"
+import { MessageSquare, FileText, Database, Settings, Palette, HelpCircle, BarChart3, Copy, TestTube, Zap, BookOpen } from "lucide-react"
 
 interface BotData {
   id: string
@@ -43,8 +48,26 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="space-y-8">
+        {/* Header Skeleton */}
+        <HeaderSkeleton />
+        
+        {/* Stats Cards Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+        </div>
+        
+        {/* Main Content Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <CardSkeleton />
+          <CardSkeleton />
+        </div>
+        
+        {/* Test Bot Skeleton */}
+        <CardSkeleton />
       </div>
     )
   }
@@ -52,155 +75,193 @@ export default function Dashboard() {
   const embedCode = botData ? `<script src="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3002'}/embed.js" data-bot-id="${botData.id}"></script>` : ""
 
   return (
-    <div>
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-              </div>
-              <div className="mr-4">
-                <p className="text-sm font-medium text-gray-600">المحادثات</p>
-                <p className="text-2xl font-bold text-gray-900">{botData?._count?.conversations || 0}</p>
-              </div>
-            </div>
+    <div className="space-y-8">
+      {/* Welcome Section */}
+      <div className="bg-gradient-to-r from-[#6366f1]/5 via-[#8b5cf6]/5 to-[#06b6d4]/5 rounded-[24px] p-8 border border-[#e1e7ef]/50">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] bg-clip-text text-transparent mb-2">
+              مرحباً، {session?.user?.name || 'المستخدم'}
+            </h1>
+            <p className="text-[#64748b] text-lg font-medium">
+              إليك نظرة عامة على أداء مساعدك الذكي اليوم
+            </p>
           </div>
-
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <div className="mr-4">
-                <p className="text-sm font-medium text-gray-600">الأسئلة والأجوبة</p>
-                <p className="text-2xl font-bold text-gray-900">{botData?._count?.qas || 0}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-              </div>
-              <div className="mr-4">
-                <p className="text-sm font-medium text-gray-600">مصادر المعرفة</p>
-                <p className="text-2xl font-bold text-gray-900">{botData?._count?.knowledgeSources || 0}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center">
-              <div className={`p-2 rounded-lg ${botData?.isActive ? 'bg-green-100' : 'bg-red-100'}`}>
-                <svg className={`w-6 h-6 ${botData?.isActive ? 'text-green-600' : 'text-red-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="mr-4">
-                <p className="text-sm font-medium text-gray-600">حالة البوت</p>
-                <p className={`text-2xl font-bold ${botData?.isActive ? 'text-green-600' : 'text-red-600'}`}>
-                  {botData?.isActive ? 'نشط' : 'غير نشط'}
-                </p>
-              </div>
+          <div className="hidden md:block">
+            <div className="w-20 h-20 bg-gradient-to-br from-[#6366f1] via-[#8b5cf6] to-[#06b6d4] rounded-full flex items-center justify-center shadow-lg glow-effect">
+              <Zap className="w-10 h-10 text-white" />
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#6366f1]/20">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-3 bg-gradient-to-br from-[#6366f1]/10 to-[#8b5cf6]/10 rounded-[12px] border border-[#6366f1]/20">
+                  <MessageSquare className="w-6 h-6 text-[#6366f1]" />
+                </div>
+                <div className="mr-4">
+                  <p className="text-sm font-medium text-[#64748b]">المحادثات</p>
+                  <p className="text-2xl font-bold text-[#030711]">{botData?._count?.conversations || 0}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#10b981]/20">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-3 bg-gradient-to-br from-[#10b981]/10 to-[#059669]/10 rounded-[12px] border border-[#10b981]/20">
+                  <HelpCircle className="w-6 h-6 text-[#10b981]" />
+                </div>
+                <div className="mr-4">
+                  <p className="text-sm font-medium text-[#64748b]">الأسئلة والأجوبة</p>
+                  <p className="text-2xl font-bold text-[#030711]">{botData?._count?.qas || 0}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#8b5cf6]/20">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-3 bg-gradient-to-br from-[#8b5cf6]/10 to-[#7c3aed]/10 rounded-[12px] border border-[#8b5cf6]/20">
+                  <Database className="w-6 h-6 text-[#8b5cf6]" />
+                </div>
+                <div className="mr-4">
+                  <p className="text-sm font-medium text-[#64748b]">مصادر المعرفة</p>
+                  <p className="text-2xl font-bold text-[#030711]">{botData?._count?.knowledgeSources || 0}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className={`hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 ${botData?.isActive ? 'hover:border-[#10b981]/20' : 'hover:border-[#ef4444]/20'}`}>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className={`p-3 rounded-[12px] border ${botData?.isActive ? 'bg-gradient-to-br from-[#10b981]/10 to-[#059669]/10 border-[#10b981]/20' : 'bg-gradient-to-br from-[#ef4444]/10 to-[#dc2626]/10 border-[#ef4444]/20'}`}>
+                    <Settings className={`w-6 h-6 ${botData?.isActive ? 'text-[#10b981]' : 'text-[#ef4444]'}`} />
+                  </div>
+                  <div className="mr-4">
+                    <p className="text-sm font-medium text-[#64748b]">حالة البوت</p>
+                    <p className={`text-lg font-bold ${botData?.isActive ? 'text-[#10b981]' : 'text-[#ef4444]'}`}>
+                      {botData?.isActive ? 'نشط' : 'غير نشط'}
+                    </p>
+                  </div>
+                </div>
+                <Badge variant={botData?.isActive ? 'success' : 'destructive'}>
+                  {botData?.isActive ? 'متاح' : 'متوقف'}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Embed Code */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">كود التضمين</h2>
-            <p className="text-sm text-gray-600 mb-4">
-              انسخ هذا الكود وألصقه في موقعك الإلكتروني لإضافة المساعد الذكي
-            </p>
-            <div className="bg-gray-100 p-4 rounded-md">
-              <code className="text-sm text-gray-800 break-all">{embedCode}</code>
-            </div>
-            <button
-              onClick={() => navigator.clipboard.writeText(embedCode)}
-              className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-            >
-              نسخ الكود
-            </button>
-          </div>
+          <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#6366f1]/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Copy className="w-5 h-5" />
+                كود التضمين
+              </CardTitle>
+              <CardDescription>
+                انسخ هذا الكود وألصقه في موقعك الإلكتروني لإضافة المساعد الذكي
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-[#f1f5f9] p-4 rounded-[12px] mb-4 border border-[#e1e7ef]/50">
+                <code className="text-sm text-[#030711] break-all font-mono">{embedCode}</code>
+              </div>
+              <Button
+                onClick={() => navigator.clipboard.writeText(embedCode)}
+                className="w-full"
+              >
+                <Copy className="w-4 h-4 ml-2" />
+                نسخ الكود
+              </Button>
+            </CardContent>
+          </Card>
 
           {/* Quick Actions */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">إجراءات سريعة</h2>
-            <div className="space-y-4">
-              <Link
-                href="/dashboard/appearance"
-                className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <div className="p-2 bg-blue-100 rounded-lg ml-4">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">تخصيص المظهر</h3>
-                  <p className="text-sm text-gray-600">غير اسم البوت، الألوان، والرسائل</p>
-                </div>
-              </Link>
+          <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#6366f1]/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5" />
+                إجراءات سريعة
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <Link
+                  href="/dashboard/appearance"
+                  className="flex items-center p-4 border border-[#e1e7ef]/50 rounded-[12px] hover:bg-[#f1f5f9] hover:border-[#6366f1]/20 transition-all duration-200 group"
+                >
+                  <div className="p-3 bg-gradient-to-br from-[#6366f1]/10 to-[#8b5cf6]/10 rounded-[12px] border border-[#6366f1]/20 ml-4">
+                    <Palette className="w-5 h-5 text-[#6366f1]" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-[#030711] group-hover:text-[#6366f1] transition-colors">تخصيص المظهر</h3>
+                    <p className="text-sm text-[#64748b]">غير اسم البوت، الألوان، والرسائل</p>
+                  </div>
+                </Link>
 
-              <Link
-                href="/dashboard/training-materials"
-                className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <div className="p-2 bg-green-100 rounded-lg ml-4">
-                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">مصادر المعرفة</h3>
-                  <p className="text-sm text-gray-600">أضف ملفات، روابط، أو نصوص</p>
-                </div>
-              </Link>
+                <Link
+                  href="/dashboard/training-materials"
+                  className="flex items-center p-4 border border-[#e1e7ef]/50 rounded-[12px] hover:bg-[#f1f5f9] hover:border-[#10b981]/20 transition-all duration-200 group"
+                >
+                  <div className="p-3 bg-gradient-to-br from-[#10b981]/10 to-[#059669]/10 rounded-[12px] border border-[#10b981]/20 ml-4">
+                    <FileText className="w-5 h-5 text-[#10b981]" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-[#030711] group-hover:text-[#10b981] transition-colors">مصادر المعرفة</h3>
+                    <p className="text-sm text-[#64748b]">أضف ملفات، روابط، أو نصوص</p>
+                  </div>
+                </Link>
 
-              <Link
-                href="/dashboard/qa"
-                className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <div className="p-2 bg-purple-100 rounded-lg ml-4">
-                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">الأسئلة والأجوبة</h3>
-                  <p className="text-sm text-gray-600">أضف أسئلة وأجوبة محددة</p>
-                </div>
-              </Link>
-            </div>
-          </div>
-        </div>
+                <Link
+                  href="/dashboard/qa"
+                  className="flex items-center p-4 border border-[#e1e7ef]/50 rounded-[12px] hover:bg-[#f1f5f9] hover:border-[#8b5cf6]/20 transition-all duration-200 group"
+                >
+                  <div className="p-3 bg-gradient-to-br from-[#8b5cf6]/10 to-[#7c3aed]/10 rounded-[12px] border border-[#8b5cf6]/20 ml-4">
+                    <HelpCircle className="w-5 h-5 text-[#8b5cf6]" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-[#030711] group-hover:text-[#8b5cf6] transition-colors">الأسئلة والأجوبة</h3>
+                    <p className="text-sm text-[#64748b]">أضف أسئلة وأجوبة محددة</p>
+                  </div>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+      </div>
 
-        {/* Test Bot */}
-        <div className="mt-8 bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">اختبر مساعدك الذكي</h2>
-          <p className="text-gray-600 mb-4">
+      {/* Test Bot */}
+      <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#06b6d4]/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="w-5 h-5" />
+            اختبر مساعدك الذكي
+          </CardTitle>
+          <CardDescription>
             جرب المساعد الذكي الخاص بك قبل نشره على موقعك
-          </p>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
           <Link
             href={`/test/${botData?.id}`}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium"
+            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#06b6d4] to-[#3b82f6] hover:from-[#0891b2] hover:to-[#2563eb] text-white rounded-[12px] font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
           >
-            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
-            </svg>
+            <BarChart3 className="w-5 h-5 ml-2" />
             اختبر الآن
           </Link>
-        </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

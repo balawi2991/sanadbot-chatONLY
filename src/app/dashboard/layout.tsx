@@ -26,8 +26,8 @@ export default function DashboardLayout({
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[#ffffff]">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#6366f1]"></div>
       </div>
     )
   }
@@ -37,50 +37,42 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="bg-[#fafbfc] min-h-screen">
       {/* Sidebar */}
-      <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
-
+      <Sidebar 
+        isOpen={sidebarOpen} 
+        setIsOpen={setSidebarOpen} 
+        session={session}
+        onSignOut={handleSignOut}
+      />
+      
       {/* Main content */}
-      <div className="flex-1">
-        {/* Header */}
-        <header className="bg-white shadow-sm border-b">
-          <div className="px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              <div className="flex items-center">
-                {/* Mobile menu button */}
-                <button
-                  onClick={() => setSidebarOpen(true)}
-                  className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 ml-4"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                </button>
-                <h1 className="text-2xl font-bold text-gray-900">لوحة التحكم</h1>
+      <div className="lg:mr-64 flex flex-col min-h-screen">
+        {/* Mobile header */}
+        <div className="lg:hidden bg-white border-b border-[#e1e7ef] px-4 py-3">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 rounded-[10px] text-[#64748b] hover:text-[#030711] hover:bg-[#f1f5f9] transition-all duration-200"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-[#5048e5] via-[#271ed2] to-[#2019ae] rounded-[12px] flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                </svg>
               </div>
-              <div className="flex items-center space-x-4 space-x-reverse">
-                <div className="flex items-center space-x-2 space-x-reverse">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-medium text-blue-600">
-                      {session.user?.name?.charAt(0) || 'U'}
-                    </span>
-                  </div>
-                  <span className="text-gray-700 hidden sm:block">مرحباً، {session.user?.name}</span>
-                </div>
-                <button
-                  onClick={handleSignOut}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  تسجيل الخروج
-                </button>
-              </div>
+              <span className="mr-3 text-xl font-bold text-[#030711]">SanadBot</span>
             </div>
           </div>
-        </header>
-
+        </div>
+        
         {/* Page content */}
-        <main className="px-4 sm:px-6 lg:px-8 py-8">
+        <main className="flex-1 p-6">
           {children}
         </main>
       </div>

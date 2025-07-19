@@ -7,8 +7,6 @@ import { BotConfig } from './widget-core'
 
 // أنماط CSS المشتركة
 const WIDGET_STYLES = `
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap');
-
 .sanadbot-widget {
   font-family: 'Tajawal', sans-serif;
   direction: rtl;

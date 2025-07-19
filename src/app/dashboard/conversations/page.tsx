@@ -2,6 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { HeaderSkeleton, StatCardSkeleton, CardSkeleton, TableRowSkeleton } from '@/components/ui/skeleton'
+import { MessageSquare, CheckCircle, Lightbulb, AlertTriangle, Search, ChevronLeft, ChevronRight } from 'lucide-react'
 
 // Types
 interface MessageType {
@@ -171,10 +177,22 @@ export default function ConversationsPage() {
   // Show loading state
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">جاري تحميل المحادثات...</p>
+      <div className="space-y-8">
+        {/* Header Skeleton */}
+        <HeaderSkeleton />
+        
+        {/* Stats Cards Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+        </div>
+        
+        {/* Main Content Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <CardSkeleton className="lg:col-span-1 min-h-[600px]" />
+          <CardSkeleton className="lg:col-span-2 min-h-[600px]" />
         </div>
       </div>
     )
@@ -192,88 +210,98 @@ export default function ConversationsPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">المحادثات</h1>
-        <p className="text-gray-600">إدارة ومراجعة جميع المحادثات مع الزوار</p>
+    <div className="space-y-8">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-[#6366f1]/5 via-[#8b5cf6]/5 to-[#06b6d4]/5 rounded-[24px] p-8 border border-[#e1e7ef]/50">
+        <div className="flex items-center gap-4 mb-3">
+          <div className="w-12 h-12 bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] rounded-[12px] flex items-center justify-center">
+            <MessageSquare className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] bg-clip-text text-transparent">المحادثات</h1>
+            <p className="text-[#64748b] text-lg font-medium">إدارة ومراجعة جميع المحادثات مع الزوار</p>
+          </div>
+        </div>
         
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-          <div className="bg-white p-4 rounded-lg shadow">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#6366f1]/20">
+            <CardContent className="p-4">
+              <div className="flex items-center">
+                <div className="p-3 bg-gradient-to-br from-[#6366f1]/10 to-[#8b5cf6]/10 rounded-[12px] border border-[#6366f1]/20">
+                  <MessageSquare className="w-6 h-6 text-[#6366f1]" />
+                </div>
+                <div className="mr-4">
+                  <p className="text-sm font-medium text-[#64748b]">إجمالي المحادثات</p>
+                  <p className="text-2xl font-bold text-[#030711]">{stats.total}</p>
+                </div>
               </div>
-              <div className="mr-4">
-                <p className="text-sm font-medium text-gray-600">إجمالي المحادثات</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
           
-          <div className="bg-white p-4 rounded-lg shadow">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+          <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#10b981]/20">
+            <CardContent className="p-4">
+              <div className="flex items-center">
+                <div className="p-3 bg-gradient-to-br from-[#10b981]/10 to-[#059669]/10 rounded-[12px] border border-[#10b981]/20">
+                  <CheckCircle className="w-6 h-6 text-[#10b981]" />
+                </div>
+                <div className="mr-4">
+                  <p className="text-sm font-medium text-[#64748b]">أسئلة وأجوبة</p>
+                  <p className="text-2xl font-bold text-[#030711]">{stats.qa}</p>
+                </div>
               </div>
-              <div className="mr-4">
-                <p className="text-sm font-medium text-gray-600">أسئلة وأجوبة</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.qa}</p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
           
-          <div className="bg-white p-4 rounded-lg shadow">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
+          <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#8b5cf6]/20">
+            <CardContent className="p-4">
+              <div className="flex items-center">
+                <div className="p-3 bg-gradient-to-br from-[#8b5cf6]/10 to-[#7c3aed]/10 rounded-[12px] border border-[#8b5cf6]/20">
+                  <Lightbulb className="w-6 h-6 text-[#8b5cf6]" />
+                </div>
+                <div className="mr-4">
+                  <p className="text-sm font-medium text-[#64748b]">ذكاء اصطناعي</p>
+                  <p className="text-2xl font-bold text-[#030711]">{stats.rag}</p>
+                </div>
               </div>
-              <div className="mr-4">
-                <p className="text-sm font-medium text-gray-600">ذكاء اصطناعي</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.rag}</p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
           
-          <div className="bg-white p-4 rounded-lg shadow">
-            <div className="flex items-center">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
+          <Card className="hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#ef4444]/20">
+            <CardContent className="p-4">
+              <div className="flex items-center">
+                <div className="p-3 bg-gradient-to-br from-[#ef4444]/10 to-[#dc2626]/10 rounded-[12px] border border-[#ef4444]/20">
+                  <AlertTriangle className="w-6 h-6 text-[#ef4444]" />
+                </div>
+                <div className="mr-4">
+                  <p className="text-sm font-medium text-[#64748b]">ردود احتياطية</p>
+                  <p className="text-2xl font-bold text-[#030711]">{stats.fallback}</p>
+                </div>
               </div>
-              <div className="mr-4">
-                <p className="text-sm font-medium text-gray-600">ردود احتياطية</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.fallback}</p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
       {/* Main Content - Two Columns */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-[600px]">
         {/* Right Column - Conversations List */}
-        <div className="lg:col-span-1 bg-white rounded-lg shadow overflow-hidden">
+        <Card className="lg:col-span-1 overflow-hidden hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#6366f1]/20">
           {/* Search and Filters - Above Conversations List */}
-          <div className="p-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">قائمة المحادثات</h2>
-            <form onSubmit={handleSearch} className="space-y-3">
+          <CardHeader className="bg-gray-50">
+            <CardTitle className="text-lg">قائمة المحادثات</CardTitle>
+            <form onSubmit={handleSearch} className="space-y-3 mt-3">
               <div>
-                <input
-                  type="text"
-                  placeholder="البحث في المحادثات أو أسماء الزوار..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder="البحث في المحادثات أو أسماء الزوار..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
               </div>
               <div className="flex gap-2">
                 <select
@@ -299,7 +327,7 @@ export default function ConversationsPage() {
               </div>
             </form>
             <p className="text-xs text-gray-600 mt-2">{conversations.length} محادثة</p>
-          </div>
+          </CardHeader>
           
           <div className="overflow-y-auto h-full">
             {conversations.length === 0 ? (
@@ -357,53 +385,57 @@ export default function ConversationsPage() {
                     صفحة {currentPage} من {totalPages}
                   </div>
                   <div className="flex gap-2">
-                    <button
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
                     >
+                      <ChevronRight className="w-4 h-4 ml-1" />
                       السابق
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
                     >
                       التالي
-                    </button>
+                      <ChevronLeft className="w-4 h-4 mr-1" />
+                    </Button>
                   </div>
                 </div>
               </div>
             )}
           </div>
-        </div>
+        </Card>
         
         {/* Left Column - Conversation Details */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow overflow-hidden">
+        <Card className="lg:col-span-2 overflow-hidden hover:shadow-lg transition-all duration-300 border-[#e1e7ef]/50 hover:border-[#6366f1]/20">
           {selectedConversation ? (
             <div className="h-full flex flex-col">
               {/* Conversation Header */}
-              <div className="p-4 border-b border-gray-200 bg-gray-50">
+              <CardHeader className="bg-gray-50">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">
+                    <CardTitle className="text-lg">
                       محادثة مع {selectedConversation.visitorName}
-                    </h2>
-                    <p className="text-sm text-gray-600">
+                    </CardTitle>
+                    <CardDescription>
                       {formatDate(new Date(selectedConversation.createdAt))} - {selectedConversation.messages.length} رسالة
-                    </p>
+                    </CardDescription>
                   </div>
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                    selectedConversation.responseType === 'qa' ? 'bg-green-100 text-green-800' :
-                    selectedConversation.responseType === 'rag' ? 'bg-purple-100 text-purple-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
+                  <Badge variant={
+                    selectedConversation.responseType === 'qa' ? 'success' :
+                    selectedConversation.responseType === 'rag' ? 'secondary' :
+                    'destructive'
+                  }>
                     {selectedConversation.responseType === 'qa' ? 'أسئلة وأجوبة' :
                      selectedConversation.responseType === 'rag' ? 'ذكاء اصطناعي' :
                      'رد احتياطي'}
-                  </span>
+                  </Badge>
                 </div>
-              </div>
+              </CardHeader>
               
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -445,7 +477,7 @@ export default function ConversationsPage() {
               </div>
             </div>
           )}
-        </div>
+        </Card>
       </div>
     </div>
   )
